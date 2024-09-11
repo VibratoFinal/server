@@ -2,10 +2,7 @@ import { IsNumber, IsString } from "class-validator";
 
 export class CreateUserDTO {
   @IsNumber()
-  uid: number;
-
-  @IsString()
-  profile_image_URL: string;
+  image_id: number;
 
   @IsString()
   nickname: string;
