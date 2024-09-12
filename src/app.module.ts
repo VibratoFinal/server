@@ -11,6 +11,8 @@ import { ImagesModule } from "./profileImages/images.module";
 import { FirebaseService } from "./firebase/firebase.service";
 import { FirebaseModule } from "./firebase/firebase.module";
 import { Images } from "./profileImages/entity/images.entity";
+import { ReivewsModule } from "./reviews/reviews.module";
+import { Reviews } from "./reviews/entity/reviews.entity";
 
 @Module({
   imports: [
@@ -25,12 +27,13 @@ import { Images } from "./profileImages/entity/images.entity";
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [Users, Follows, Images],
+      entities: [Users, Follows, Images, Reviews],
       synchronize: true,
     }),
     // FollowsModule,
     ImagesModule,
     FirebaseModule,
+    ReivewsModule,
   ],
   controllers: [AppController],
   providers: [AppService, FirebaseService],
