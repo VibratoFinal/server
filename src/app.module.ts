@@ -7,9 +7,10 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { Users } from "./users/entity/users.entity";
 // import { FollowsModule } from "./follows/follows.module";
 import { Follows } from "./follows/entity/follows.entity";
-import { ImagesModule } from "./images/images.module";
+import { ImagesModule } from "./profileImages/images.module";
 import { FirebaseService } from "./firebase/firebase.service";
 import { FirebaseModule } from "./firebase/firebase.module";
+import { Images } from "./profileImages/entity/images.entity";
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { FirebaseModule } from "./firebase/firebase.module";
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [Users, Follows],
+      entities: [Users, Follows, Images],
       synchronize: true,
     }),
     // FollowsModule,

@@ -32,12 +32,12 @@ export class UsersService {
         .insert()
         .values({
           uid: uid,
-          image_id: user.image_id,
+          profile_image_id: user.image_id,
           nickname: user.nickname,
         })
         .execute();
     } catch (error) {
-      throw new Error(`${error} error`);
+      throw new Error(error);
     }
   }
 }
