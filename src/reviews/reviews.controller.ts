@@ -25,7 +25,7 @@ export class ReviewsController {
     private readonly reviewsService: ReviewsService,
   ) {}
   @Post()
-  async createReview(
+  async addReview(
     @Headers("Authorization") authHeader: string,
     @Body()
     createReviewDTO: CreateReviewDTO,
