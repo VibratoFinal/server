@@ -1,12 +1,14 @@
-import { User } from "src/users/entity/user.entity";
-import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { Users } from "src/users/entity/users.entity";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 
 @Entity()
 export class Follows {
+  // artist, albums id
   @PrimaryColumn()
-  album_id: number;
-
-  @ManyToOne(() => User, (user) => user.uid, { eager: true })
+  @ManyToOne(() => Users, (user) => user.uid, { eager: true })
   @JoinColumn({ name: "user_uid" })
-  user_uid: User;
+  user_uid: Users;
+
+  @Column()
+  type_id: number;
 }
