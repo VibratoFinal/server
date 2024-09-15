@@ -1,7 +1,12 @@
-import { IsNumber } from "class-validator";
+// import { IsString } from "class-validator";
 
-export class CreateFollowDTO {
-  // 프론트 연결 후 user_uid 필요
-  @IsNumber()
-  type_id: number;
-}
+// export class FindFollowDTO {
+//   @IsString()
+//   user_uid: string;
+//   type_id: number;
+// }
+
+// // export class CreateFollowDTO extends FindFollowDTO {
+// //   @IsNumber()
+// //   type_id: number;
+// // }

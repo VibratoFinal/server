@@ -1,11 +1,9 @@
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsNumber, IsString } from "class-validator";
 
 export class CreateUserDTO {
-  @IsNotEmpty()
   @IsNumber()
-  profileImageId: number;
+  image_id: number;
 
-  @IsNotEmpty()
   @IsString()
   nickname: string;
 }

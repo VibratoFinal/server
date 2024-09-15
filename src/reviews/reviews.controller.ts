@@ -11,6 +11,8 @@ import {
 // import { UsersService } from "src/users/users.service";
 import { ReviewsService } from "./reviews.service";
 import { CreateReviewDTO } from "./dto/create-reviews.dto";
+import { Reviews } from "./entity/reviews.entity";
+
 // 리뷰 작성 add
 // 리뷰 전체 조회 get
 // 리뷰 수정 edit
@@ -23,7 +25,7 @@ export class ReviewsController {
     private readonly reviewsService: ReviewsService,
   ) {}
   @Post()
-  async addReview(
+  async createReview(
     @Headers("Authorization") authHeader: string,
     @Body()
     createReviewDTO: CreateReviewDTO,
@@ -42,16 +44,16 @@ export class ReviewsController {
     return getReviews;
   }
 
-  @Put(":review_id")
+  @Put(":reviewId")
   async editReview(
-    @Param("review_id") review_id: number,
+    @Param("reviewId") reviewId: Reviews,
     @Headers("Authorization") authHeader: string,
     @Body()
     createReviewDTO: CreateReviewDTO,
   ) {
     try {
       await this.reviewsService.editReview(
-        review_id,
+        reviewId,
         createReviewDTO,
         authHeader,
       );
@@ -61,12 +63,12 @@ export class ReviewsController {
     }
   }
 
-  @Delete(":review_id")
+  @Delete(":reviewId")
   async deleteReview(
-    @Param("review_id") review_id: number,
+    @Param("reviewId") reviewId: Reviews,
     @Headers("Authorization") authHeader: string,
   ) {
-    await this.reviewsService.deleteReview(review_id, authHeader);
+    await this.reviewsService.deleteReview(reviewId, authHeader);
     return { message: "Review 삭제 완료" };
   }
 }
