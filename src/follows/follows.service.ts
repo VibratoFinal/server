@@ -1,49 +1,59 @@
-// import { Injectable, NotFoundException } from "@nestjs/common";
-// import { InjectRepository } from "@nestjs/typeorm";
-// import { Follows } from "./entity/follows.entity";
-// import { Repository } from "typeorm";
-// import { CreateFollowDTO, FindFollowDTO } from "./dto/create-follows.dto";
-// import { User } from "src/users/entity/user.entity";
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Follows } from "./entity/follows.entity";
+import { Repository } from "typeorm";
+import { CreateFollowDTO } from "./dto/create-follows.dto";
+import { Users } from "src/users/entity/users.entity";
 
-// @Injectable()
-// export class FollowsService {
-//   constructor(
-//     @InjectRepository(Follows)
-//     private followRepository: Repository<Follows>,
+// 팔로우 추가/삭제
 
-//     @InjectRepository(User)
-//     private userRepository: Repository<User>,
-//   ) {}
+@Injectable()
+export class FollowsService {
+  constructor(
+    @InjectRepository(Follows)
+    private followRepository: Repository<Follows>,
+    @InjectRepository(Users)
+    private usersRepository: Repository<Users>,
+  ) {}
 
-//   findAll(): Promise<Follows[]> {
-//     return this.followRepository.find();
-//   }
+  async addFollow(uid: string, typeId: CreateFollowDTO) {
+    try {
+      const user = await this.usersRepository.findOne({ where: { uid } });
+      if (!user) {
+        throw new Error("User not found");
+      }
 
-//   async find(findFollowDTO: FindFollowDTO) {
-//     const { user_uid } = findFollowDTO;
-//     const user = await this.userRepository.findOne({
-//       where: { uid: parseInt(user_uid, 10) },
-//     });
-//     if (!user) {
-//       throw new NotFoundException("User not found");
-//     }
+      await this.followRepository
+        .createQueryBuilder("follows")
+        .insert()
+        .values({
+          user_uid: user,
+          type_id: typeId.type_id,
+        })
+        .execute();
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 
-//     return this.followRepository.findOne({ where: { user_uid: user } });
-//   }
-//   async create(createFollowDTO: CreateFollowDTO) {
-//     const { user_uid, type_id } = createFollowDTO;
+  async deleteFollow(uid: string, typeId: CreateFollowDTO) {
+    try {
+      const user = await this.usersRepository.findOne({ where: { uid } });
+      if (!user) {
+        throw new Error("User not found");
+      }
 
-//     const user = await this.userRepository.findOne({
-//       where: { uid: parseInt(user_uid, 10) },
-//     });
-//     if (!user) {
-//       throw new NotFoundException("User not found");
-//     }
-
-//     const follow = new Follows();
-//     follow.type_id = type_id;
-//     follow.user_uid = user;
-
-//     return this.followRepository.save(follow);
-//   }
-// }
+      await this.followRepository
+        .createQueryBuilder()
+        .delete()
+        .from("follows")
+        .where("follows.user_uid= :user_uid AND follows.type_id = :type_id", {
+          user_uid: uid,
+          type_id: typeId,
+        })
+        .execute();
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+}

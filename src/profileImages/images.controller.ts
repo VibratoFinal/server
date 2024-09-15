@@ -1,23 +1,23 @@
 import { Body, Controller, Get, Post } from "@nestjs/common";
-import { ImagesService } from "./images.service";
+import { ProfileImagesService } from "./images.service";
 import { CreateImageDTO } from "./dto/create-images.dto";
 
 @Controller("images")
 export class ImagesController {
-  constructor(private readonly imagesService: ImagesService) {}
+  constructor(private readonly profileImagesService: ProfileImagesService) {}
 
   @Get()
   async getProfileImages() {
-    const images = await this.imagesService.getProfileImage();
+    const images = await this.profileImagesService.getAllImages();
 
     return images;
   }
 
   @Post()
-  async createProfileImage(
+  createProfileImage(
     @Body()
     createImageDTO: CreateImageDTO,
   ) {
-    return this.imagesService.addProfileImage(createImageDTO);
+    return this.profileImagesService.addProfileImage(createImageDTO);
   }
 }

@@ -1,36 +1,32 @@
-import { Comments } from "src/comments/entity/comments.entity";
+import { Reviews } from "src/reviews/entity/reviews.entity";
 import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToMany,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 
 @Entity()
-export class Reviews {
+export class Comments {
   @PrimaryGeneratedColumn()
-  review_id: number;
+  comment_id: number;
 
   @Column()
   user_uid: string;
 
   @Column()
-  rated: number;
-
-  @Column()
   contents: string;
 
-  @Column()
-  type_id: number;
+  @ManyToOne(() => Reviews, (review) => review.comments)
+  @JoinColumn({ name: "review_id" })
+  review: Reviews;
 
   @CreateDateColumn()
   created_at: Date;
 
   @UpdateDateColumn()
   updated_at: Date;
-
-  @OneToMany(() => Comments, (comment) => comment.review, { eager: true })
-  comments: Comments[];
 }
