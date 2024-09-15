@@ -1,31 +1,22 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Images } from "./entity/images.entity";
+import { ProfileImages } from "./entity/images.entity";
 import { Repository } from "typeorm";
 import { CreateImageDTO } from "./dto/create-images.dto";
 
 @Injectable()
-export class ImagesService {
+export class ProfileImagesService {
   constructor(
-    @InjectRepository(Images)
-    private imageRepository: Repository<Images>,
+    @InjectRepository(ProfileImages)
+    private profileImagesRepository: Repository<ProfileImages>,
   ) {}
-  async getProfileImage() {
-    try {
-      const getImage = await this.imageRepository
-        .createQueryBuilder("images")
-        .select("images")
-        .getMany();
-
-      return getImage;
-    } catch (error) {
-      throw new Error(error);
-    }
+  async getAllImages(): Promise<ProfileImages[]> {
+    return this.profileImagesRepository.find();
   }
 
   async addProfileImage(createImageDTO: CreateImageDTO) {
     try {
-      await this.imageRepository
+      await this.profileImagesRepository
         .createQueryBuilder("images")
         .insert()
         .values({

@@ -4,9 +4,10 @@ import { UsersService } from "./users.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Users } from "./entity/users.entity";
 import { FirebaseModule } from "src/firebase/firebase.module";
+import { ProfileImages } from "src/profileImages/entity/images.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Users]), FirebaseModule],
+  imports: [TypeOrmModule.forFeature([Users, ProfileImages]), FirebaseModule],
   controllers: [UsersController],
   providers: [UsersService],
 })

@@ -1,25 +1,30 @@
-// import { Controller, Get, Headers, Param, Post } from "@nestjs/common";
-// import { FollowsService } from "./follows.service";
+import { Body, Controller, Delete, Headers, Post } from "@nestjs/common";
+import { FollowsService } from "./follows.service";
+import { CreateFollowDTO } from "./dto/create-follows.dto";
 
-// @Controller("follows")
-// export class FollowsController {
-//   constructor(private readonly followsService: FollowsService) {}
+@Controller("follows")
+export class FollowsController {
+  constructor(private readonly followsService: FollowsService) {}
 
-//   @Get()
-//   findFollows(@Headers("Authorization") user_uid: string) {
-//     return this.followsService.find({
-//       user_uid,
-//     });
-//   }
+  @Post()
+  async follow(
+    @Headers("Authorization") authHeader: string,
+    @Body()
+    createFollowDTO: CreateFollowDTO,
+  ) {
+    const uid = authHeader.split("Bearer ")[1];
+    const follow = await this.followsService.addFollow(uid, createFollowDTO);
+    return follow;
+  }
 
-//   @Post(":type_id")
-//   createFollows(
-//     @Param("type_id") type_id: number,
-//     @Headers("Authorization") user_uid: string,
-//   ) {
-//     return this.followsService.create({
-//       type_id: type_id,
-//       user_uid: user_uid,
-//     });
-//   }
-// }
+  @Delete()
+  async unFollow(
+    @Headers("Authorization") authHeader: string,
+    @Body()
+    createFollowDTO: CreateFollowDTO,
+  ) {
+    const uid = authHeader.split("Bearer ")[1];
+    const follow = await this.followsService.deleteFollow(uid, createFollowDTO);
+    return follow;
+  }
+}
