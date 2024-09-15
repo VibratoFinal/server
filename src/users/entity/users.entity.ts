@@ -16,10 +16,7 @@ export class Users {
   @Column({ type: "varchar", unique: true, comment: "유저 아이디" })
   uid: string;
 
-  @ManyToOne(() => ProfileImages, {
-    eager: true,
-    nullable: true,
-  })
+  @ManyToOne(() => ProfileImages, { eager: true, nullable: false })
   @JoinColumn({ name: "profile_image_id" })
   profileImage: ProfileImages;
 

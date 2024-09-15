@@ -40,7 +40,7 @@ export class CommentsController {
 
   @Put(":commentId")
   async editComments(
-    @Param("commentId") commentId: Comments,
+    @Param("commentId") commentId: number,
     @Headers("Authorization") authHeader: string,
     @Body()
     createCommentDTO: CreateCommentDTO,

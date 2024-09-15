@@ -1,8 +1,12 @@
+import { Reviews } from "src/reviews/entity/reviews.entity";
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from "typeorm";
 
 @Entity()
@@ -16,9 +20,13 @@ export class Comments {
   @Column()
   contents: string;
 
-  @Column()
-  review_id: number;
+  @ManyToOne(() => Reviews, (review) => review.comments)
+  @JoinColumn({ name: "review_id" })
+  review: Reviews;
 
   @CreateDateColumn()
   created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 }
