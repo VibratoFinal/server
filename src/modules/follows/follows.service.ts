@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Follows } from "./entity/follows.entity";
 import { Repository } from "typeorm";
 import { CreateFollowDTO } from "./dto/create-follows.dto";
-import { Users } from "src/users/entity/users.entity";
+import { Users } from "src/modules/auth/entity/auth.entity";
 
 // 팔로우 추가/삭제
 

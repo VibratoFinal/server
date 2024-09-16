@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Comments } from "./entity/comments.entity";
 import { Repository } from "typeorm";
 import { CreateCommentDTO } from "./dto/create-comments.dto";
-import { Reviews } from "src/reviews/entity/reviews.entity";
+import { Reviews } from "src/modules/reviews/entity/reviews.entity";
 
 // 코멘트 작성 add
 // 수정 edit

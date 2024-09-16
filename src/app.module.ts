@@ -1,20 +1,20 @@
 import { Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { UsersModule } from "./users/users.module";
+import { UsersModule } from "./modules/auth/auth.module";
 import { ConfigModule } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { Users } from "./users/entity/users.entity";
-import { FollowsModule } from "./follows/follows.module";
-import { Follows } from "./follows/entity/follows.entity";
-import { ImagesModule } from "./profileImages/images.module";
-import { FirebaseService } from "./firebase/firebase.service";
-import { FirebaseModule } from "./firebase/firebase.module";
-import { ProfileImages } from "./profileImages/entity/images.entity";
-import { ReivewsModule } from "./reviews/reviews.module";
-import { Reviews } from "./reviews/entity/reviews.entity";
-import { CommentsModule } from "./comments/comments.module";
-import { Comments } from "./comments/entity/comments.entity";
+import { Users } from "./modules/auth/entity/auth.entity";
+import { FollowsModule } from "./modules/follows/follows.module";
+import { Follows } from "./modules/follows/entity/follows.entity";
+import { ImagesModule } from "./modules/profileImages/images.module";
+import { FirebaseService } from "./config/firebase/firebase.service";
+import { FirebaseModule } from "./config/firebase/firebase.module";
+import { ProfileImages } from "./modules/profileImages/entity/images.entity";
+import { ReivewsModule } from "./modules/reviews/reviews.module";
+import { Reviews } from "./modules/reviews/entity/reviews.entity";
+import { CommentsModule } from "./modules/comments/comments.module";
+import { Comments } from "./modules/comments/entity/comments.entity";
 
 @Module({
   imports: [

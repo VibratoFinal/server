@@ -1,4 +1,4 @@
-import { ProfileImages } from "src/profileImages/entity/images.entity";
+import { ProfileImages } from "src/modules/profileImages/entity/images.entity";
 import {
   Column,
   CreateDateColumn,

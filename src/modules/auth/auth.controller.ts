@@ -7,9 +7,9 @@ import {
   Put,
   UnauthorizedException,
 } from "@nestjs/common";
-import { UsersService } from "./users.service";
+import { UsersService } from "./auth.service";
 import { CreateUserDTO } from "./dto/create-user.dto";
-import { FirebaseService } from "src/firebase/firebase.service";
+import { FirebaseService } from "src/config/firebase/firebase.service";
 @Controller("auth")
 export class UsersController {
   constructor(
