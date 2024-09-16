@@ -43,4 +43,23 @@ export class UsersService {
       throw new Error(error);
     }
   }
+
+  async editUser(uid: string, user: CreateUserDTO) {
+    try {
+      const profileImage = await this.profileimagesRepository.findOne({
+        where: { id: user.profileImageId },
+      });
+
+      if (!profileImage) {
+        throw new Error("Profile image not found");
+      }
+
+      await this.userRepository.update(
+        { uid: uid },
+        { profileImage: profileImage, nickname: user.nickname },
+      );
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 }

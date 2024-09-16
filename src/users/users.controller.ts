@@ -4,6 +4,7 @@ import {
   Get,
   Headers,
   Post,
+  Put,
   UnauthorizedException,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
@@ -60,6 +61,30 @@ export class UsersController {
       const uid = idToken; // 프론트 연결 후 위에 uid사용
 
       return this.usersService.joinUser(uid, createUserDTO);
+    } catch (error) {
+      throw new UnauthorizedException(
+        `Invalid Firebase Token: ${error.message}`,
+      );
+    }
+  }
+
+  @Put("edit")
+  async editUser(
+    @Headers("Authorization") authHeader: string,
+    @Body() userEdit: CreateUserDTO,
+  ) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      throw new UnauthorizedException(
+        "Authorization header is missing or invalid",
+      );
+    }
+    const idToken = authHeader.split("Bearer ")[1];
+    try {
+      // const uid = await this.firebaseService.verifyToken(idToken);
+
+      const uid = idToken; // 프론트 연결 후 위에 uid사용
+
+      return this.usersService.editUser(uid, userEdit);
     } catch (error) {
       throw new UnauthorizedException(
         `Invalid Firebase Token: ${error.message}`,
