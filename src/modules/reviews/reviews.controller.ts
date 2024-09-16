@@ -12,7 +12,8 @@ import {
 import { ReviewsService } from "./reviews.service";
 import { CreateReviewDTO } from "./dto/create-reviews.dto";
 // 리뷰 작성 add
-// 리뷰 전체 조회 get
+// 리뷰 전체 조회 getAll
+// 내가 쓴 리뷰 조회 get
 // 리뷰 수정 edit
 // 리뷰 삭제 delete
 
@@ -35,11 +36,14 @@ export class ReviewsController {
     }
   }
 
-  @Get()
-  async getReviews() {
-    const getReviews = await this.reviewsService.getReviews();
-
-    return getReviews;
+  @Get(":type_id")
+  async getAllReviews(@Param("type_id") typeId: string) {
+    try {
+      const numericTypeId = parseInt(typeId, 10);
+      return await this.reviewsService.getAllReviews(numericTypeId);
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
   @Put(":review_id")

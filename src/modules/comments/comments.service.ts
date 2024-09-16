@@ -7,7 +7,8 @@ import { Reviews } from "src/modules/reviews/entity/reviews.entity";
 
 // 코멘트 작성 add
 // 수정 edit
-// 조회 get
+// 전체조회 getAll
+// 내가 쓴 댓글 조회 get
 // 삭제 delete
 
 @Injectable()
@@ -36,7 +37,7 @@ export class CommentsService {
     }
   }
 
-  async getComments(reviewId: number): Promise<Comments[]> {
+  async getAllComments(reviewId: number): Promise<Comments[]> {
     try {
       return await this.commentRepository
         .createQueryBuilder()

@@ -27,13 +27,18 @@ export class ReviewsService {
   }
 
   // 리뷰 전체 조회
-  async getReviews(): Promise<Reviews[]> {
+  async getAllReviews(typeId: number) {
     try {
-      return await this.reviewRepository.find();
+      return await this.reviewRepository
+        .createQueryBuilder()
+        .where("reviews.type_id = :typeId", { typeId })
+        .getMany();
     } catch (error) {
       throw new Error(error);
     }
   }
+
+  // 내가 쓴 리뷰 조회
 
   // 리뷰 수정
   async editReview(

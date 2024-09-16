@@ -20,7 +20,7 @@ export class Comments {
   @Column()
   contents: string;
 
-  @ManyToOne(() => Reviews, (review) => review.comments)
+  @ManyToOne(() => Reviews, review => review.comments)
   @JoinColumn({ name: "review_id" })
   review: Reviews;
 

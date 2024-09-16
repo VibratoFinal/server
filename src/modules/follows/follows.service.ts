@@ -23,14 +23,10 @@ export class FollowsService {
         throw new Error("User not found");
       }
 
-      await this.followRepository
-        .createQueryBuilder("follows")
-        .insert()
-        .values({
-          user_uid: user,
-          type_id: typeId.type_id,
-        })
-        .execute();
+      await this.followRepository.insert({
+        user_uid: user,
+        type_id: typeId.type_id,
+      });
     } catch (error) {
       throw new Error(error);
     }

@@ -32,10 +32,10 @@ export class CommentsController {
   }
 
   @Get(":reviewId")
-  async getComments(@Param("reviewId") reviewId: number) {
-    const getComments = await this.commentsService.getComments(reviewId);
+  async getAllComments(@Param("reviewId") reviewId: number) {
+    const getAllComments = await this.commentsService.getAllComments(reviewId);
 
-    return getComments;
+    return getAllComments;
   }
 
   @Put(":commentId")

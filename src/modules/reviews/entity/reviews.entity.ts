@@ -31,6 +31,6 @@ export class Reviews {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @OneToMany(() => Comments, (comment) => comment.review, { eager: true })
+  @OneToMany(() => Comments, comment => comment.review, { eager: true })
   comments: Comments[];
 }
