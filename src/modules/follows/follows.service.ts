@@ -7,6 +7,9 @@ import { Users } from "src/modules/auth/entity/auth.entity";
 
 // 팔로우 추가/삭제
 
+// type_id는 spotify API 연동하면서 비교를 해야할 듯
+// 지금은 어떤 type_id든 다 들어감.
+
 @Injectable()
 export class FollowsService {
   constructor(
@@ -16,38 +19,35 @@ export class FollowsService {
     private usersRepository: Repository<Users>,
   ) {}
 
-  async addFollow(uid: string, typeId: CreateFollowDTO) {
+  async addFollow(uid: string, createFollowDTO: CreateFollowDTO) {
     try {
+      const { type_id } = createFollowDTO;
       const user = await this.usersRepository.findOne({ where: { uid } });
       if (!user) {
         throw new Error("User not found");
       }
 
-      await this.followRepository.insert({
+      return await this.followRepository.insert({
         user_uid: user,
-        type_id: typeId.type_id,
+        type_id,
       });
     } catch (error) {
       throw new Error(error);
     }
   }
 
-  async deleteFollow(uid: string, typeId: CreateFollowDTO) {
+  async deleteFollow(uid: string, createFollowDTO: CreateFollowDTO) {
     try {
+      const { type_id } = createFollowDTO;
       const user = await this.usersRepository.findOne({ where: { uid } });
       if (!user) {
         throw new Error("User not found");
       }
 
-      await this.followRepository
-        .createQueryBuilder()
-        .delete()
-        .from("follows")
-        .where("follows.user_uid= :user_uid AND follows.type_id = :type_id", {
-          user_uid: uid,
-          type_id: typeId,
-        })
-        .execute();
+      return await this.followRepository.delete({
+        user_uid: user,
+        type_id,
+      });
     } catch (error) {
       throw new Error(error);
     }

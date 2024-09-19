@@ -23,6 +23,8 @@ export class ReviewsController {
     // private readonly usersService: UsersService  // uid 사용할 때 사용할 것
     private readonly reviewsService: ReviewsService,
   ) {}
+
+  // 리뷰 작성
   @Post()
   async addReview(
     @Headers("Authorization") authHeader: string,
@@ -36,16 +38,27 @@ export class ReviewsController {
     }
   }
 
+  // type_id (앨범,트랙,아티스트) 리뷰 전체 조회
   @Get(":type_id")
-  async getAllReviews(@Param("type_id") typeId: string) {
+  async getAllReviews(@Param("type_id") typeId: number) {
     try {
-      const numericTypeId = parseInt(typeId, 10);
-      return await this.reviewsService.getAllReviews(numericTypeId);
+      return await this.reviewsService.getAllReviews(typeId);
     } catch (error) {
       throw new Error(error);
     }
   }
 
+  // 내가 쓴 리뷰 조회
+  @Get()
+  async getUserReviews(@Headers("Authorization") authHeader: string) {
+    try {
+      return await this.reviewsService.getUserReviews(authHeader);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  // 리뷰 수정
   @Put(":review_id")
   async editReview(
     @Param("review_id") review_id: number,
@@ -65,6 +78,7 @@ export class ReviewsController {
     }
   }
 
+  // 리뷰 삭제
   @Delete(":review_id")
   async deleteReview(
     @Param("review_id") review_id: number,

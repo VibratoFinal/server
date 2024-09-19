@@ -10,36 +10,46 @@ import {
 } from "@nestjs/common";
 import { CommentsService } from "./comments.service";
 import { CreateCommentDTO } from "./dto/create-comments.dto";
-import { Comments } from "./entity/comments.entity";
 
-@Controller("comments")
+@Controller("review")
 export class CommentsController {
   constructor(
     // private readonly usersService: UsersService  // uid 사용할 때 사용할 것
     private readonly commentsService: CommentsService,
   ) {}
-  @Post()
+  @Post(":review_id/comments")
   async addComment(
     @Headers("Authorization") authHeader: string,
+    @Param("review_id") reviewId: number,
     @Body()
     createCommentDTO: CreateCommentDTO,
   ) {
     try {
-      return this.commentsService.addComment(authHeader, createCommentDTO);
+      return this.commentsService.addComment(
+        authHeader,
+        reviewId,
+        createCommentDTO,
+      );
     } catch (error) {
       throw new Error(error);
     }
   }
 
-  @Get(":reviewId")
+  // 해당 리뷰 전체 댓글 조회
+  @Get(":reviewId/comments")
   async getAllComments(@Param("reviewId") reviewId: number) {
-    const getAllComments = await this.commentsService.getAllComments(reviewId);
-
-    return getAllComments;
+    return await this.commentsService.getAllComments(reviewId);
   }
 
-  @Put(":commentId")
+  // 내가 쓴 댓글 조회
+  @Get("comments")
+  async getUserComments(@Headers("Authorization") uid: string) {
+    return await this.commentsService.getUserComments(uid);
+  }
+
+  @Put(":reviewId/comments/:commentId")
   async editComments(
+    @Param("reviewId") reviewId: number,
     @Param("commentId") commentId: number,
     @Headers("Authorization") authHeader: string,
     @Body()
@@ -48,6 +58,7 @@ export class CommentsController {
     try {
       await this.commentsService.editComments(
         commentId,
+        reviewId,
         createCommentDTO,
         authHeader,
       );
@@ -57,9 +68,9 @@ export class CommentsController {
     }
   }
 
-  @Delete(":commentId")
+  @Delete(":reviewId/comments/:commentId")
   async deleteComment(
-    @Param("commentId") commentId: Comments,
+    @Param("commentId") commentId: number,
     @Headers("Authorization") authHeader: string,
   ) {
     await this.commentsService.deleteComment(commentId, authHeader);

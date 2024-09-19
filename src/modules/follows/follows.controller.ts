@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Headers, Post } from "@nestjs/common";
+import { Controller, Delete, Headers, Post, Body } from "@nestjs/common";
 import { FollowsService } from "./follows.service";
 import { CreateFollowDTO } from "./dto/create-follows.dto";
 

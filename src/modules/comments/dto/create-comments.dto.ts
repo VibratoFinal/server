@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from "class-validator";
+import { IsString } from "class-validator";
 
 export class CreateCommentDTO {
   /// 프론트 연결 후 사용
@@ -7,7 +7,4 @@ export class CreateCommentDTO {
 
   @IsString()
   contents: string;
-
-  @IsNumber()
-  review_id: number;
 }

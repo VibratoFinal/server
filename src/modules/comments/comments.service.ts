@@ -8,7 +8,7 @@ import { Reviews } from "src/modules/reviews/entity/reviews.entity";
 // 코멘트 작성 add
 // 수정 edit
 // 전체조회 getAll
-// 내가 쓴 댓글 조회 get
+// 내가 쓴 댓글 조회 get // UID 필요
 // 삭제 delete
 
 @Injectable()
@@ -21,80 +21,81 @@ export class CommentsService {
     private reviewRepository: Repository<Reviews>,
   ) {}
 
-  async addComment(uid: string, comment: CreateCommentDTO) {
+  // 댓글 작성
+  async addComment(
+    uid: string,
+    reviewId: number,
+    createCommentDTO: CreateCommentDTO,
+  ) {
+    const { contents } = createCommentDTO;
     try {
-      const reviewId = await this.reviewRepository.findOne({
-        where: { review_id: comment.review_id },
+      const review = await this.reviewRepository.findOne({
+        where: { review_id: reviewId },
       });
 
       await this.commentRepository.insert({
         user_uid: uid,
-        contents: comment.contents,
-        review: reviewId,
+        contents,
+        review,
       });
     } catch (error) {
       throw new Error(error);
     }
   }
 
+  // 해당 리뷰 댓글 전체 조회 (review_id)
   async getAllComments(reviewId: number): Promise<Comments[]> {
     try {
-      return await this.commentRepository
-        .createQueryBuilder()
-        .where("comments.review_id = :reviewId", { reviewId })
-        .getMany();
+      return await this.commentRepository.find({
+        where: { review: { review_id: reviewId } },
+      });
     } catch (error) {
       throw new Error(error);
     }
   }
 
+  // 내가 쓴 댓글 조회 (uid)
+  async getUserComments(uid: string): Promise<Comments[]> {
+    try {
+      return await this.commentRepository.find({ where: { user_uid: uid } });
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  // 댓글 수정
   async editComments(
     commentId: number,
-    comment: CreateCommentDTO,
+    reviewId: number,
+    createCommentDTO: CreateCommentDTO,
     uid: string,
   ) {
     try {
+      const { contents } = createCommentDTO;
       const review = await this.reviewRepository.findOne({
-        where: { review_id: comment.review_id },
+        where: { review_id: reviewId },
       });
 
       if (!review) {
         throw new Error("Review not found");
       }
 
-      await this.commentRepository
-        .createQueryBuilder()
-        .update()
-        .set({ contents: comment.contents })
-        .where(
-          "comments.comment_id = :comment_id AND comments.user_uid = :uid",
-          {
-            comment_id: commentId,
-            uid: uid,
-          },
-        )
-        .execute();
+      await this.commentRepository.update(
+        { comment_id: commentId, user_uid: uid },
+        { contents },
+      );
     } catch (error) {
       throw new Error(error);
     }
   }
 
-  async deleteComment(commentId: Comments, uid: string) {
+  // 댓글 삭제
+  async deleteComment(commentId: number, uid: string) {
     try {
-      const deleteComment = await this.commentRepository
-        .createQueryBuilder()
-        .delete()
-        .from("comments")
-        .where(
-          "comments.comment_id = :comment_id AND comments.user_uid = :uid",
-          {
-            comment_id: commentId,
-            uid: uid,
-          },
-        )
-        .execute();
-
-      return deleteComment;
+      return await this.commentRepository.delete({
+        comment_id: commentId,
+        user_uid: uid,
+      });
     } catch (error) {
       throw new Error(error);
     }
