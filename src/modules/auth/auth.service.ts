@@ -16,50 +16,37 @@ export class UsersService {
   ) {}
 
   async getUser(uid: string): Promise<Users | null> {
-    try {
-      const user = await this.userRepository.findOne({ where: { uid } });
-      return user;
-    } catch (error) {
-      throw new Error(error);
-    }
+    return await this.userRepository.findOne({ where: { uid } });
   }
 
   async joinUser(uid: string, user: CreateUserDTO) {
-    try {
-      const profileImage = await this.profileimagesRepository.findOne({
-        where: { id: user.profileImageId },
-      });
+    const profileImage = await this.profileimagesRepository.findOne({
+      where: { id: user.profileImageId },
+    });
 
-      if (!profileImage) {
-        throw new Error("Profile image not found");
-      }
-
-      await this.userRepository.insert({
-        uid: uid,
-        profileImage: profileImage,
-        nickname: user.nickname,
-      });
-    } catch (error) {
-      throw new Error(error);
+    if (!profileImage) {
+      throw new Error("Profile image not found");
     }
+
+    await this.userRepository.insert({
+      uid: uid,
+      profileImage: profileImage,
+      nickname: user.nickname,
+    });
   }
 
   async editUser(uid: string, user: CreateUserDTO) {
-    try {
-      const profileImage = await this.profileimagesRepository.findOne({
-        where: { id: user.profileImageId },
-      });
+    const profileImage = await this.profileimagesRepository.findOne({
+      where: { id: user.profileImageId },
+    });
 
-      if (!profileImage) {
-        throw new Error("Profile image not found");
-      }
-
-      await this.userRepository.update(
-        { uid: uid },
-        { profileImage: profileImage, nickname: user.nickname },
-      );
-    } catch (error) {
-      throw new Error(error);
+    if (!profileImage) {
+      throw new Error("Profile image not found");
     }
+
+    await this.userRepository.update(
+      { uid: uid },
+      { profileImage: profileImage, nickname: user.nickname },
+    );
   }
 }

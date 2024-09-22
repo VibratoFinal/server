@@ -1,8 +1,13 @@
-import { Column, Entity } from "typeorm";
+import { Entity, JoinColumn, ManyToOne } from "typeorm";
 import { LikesReviews } from "./likesReview.entity";
+import { Comments } from "src/modules/comments/entity/comments.entity";
 
 @Entity()
 export class LikesComments extends LikesReviews {
-  @Column()
+  @ManyToOne(() => Comments, comment => comment.comment_id, {
+    eager: true,
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({ name: "comment_id" })
   comment_id: number;
 }
