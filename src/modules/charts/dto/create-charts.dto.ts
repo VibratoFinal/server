@@ -1,5 +1,12 @@
-import { IsArray, IsDate, IsNumber, IsString, IsUrl } from "class-validator";
-import { ArtistDTO } from "src/modules/musics/dto/create-result.dto";
+import {
+  IsArray,
+  IsBoolean,
+  IsDate,
+  IsNumber,
+  IsString,
+  IsUrl,
+} from "class-validator";
+import { ArtistOtherDTO } from "src/modules/musics/dto/create-result.dto";
 
 export class ChartsDTO {
   @IsString()
@@ -7,6 +14,9 @@ export class ChartsDTO {
 
   @IsString()
   name: string;
+
+  @IsArray()
+  artists_name: string[];
 
   @IsUrl()
   spotify_url: string;
@@ -21,7 +31,7 @@ export class ChartsDTO {
   album_name: string;
 
   @IsUrl()
-  album_image: string;
+  image_url: string;
 
   @IsUrl()
   album_spotify_url: string;
@@ -30,8 +40,14 @@ export class ChartsDTO {
   release_date: Date;
 
   @IsArray()
-  album_artists: ArtistDTO[];
+  album_artists: ArtistOtherDTO[];
 
   @IsNumber()
-  rated: number;
+  avg_rated: number;
+
+  @IsNumber()
+  count_rated: number;
+
+  @IsBoolean()
+  liked: boolean;
 }
