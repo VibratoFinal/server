@@ -6,14 +6,17 @@ import admin from "firebase-admin";
 export class FirebaseService {
   constructor(private readonly configService: ConfigService) {
     const firebaseAppName = "vibrato";
+    const privateKey = this.configService.get<string>("FIREBASE_PRIVATE_KEY");
+
+    if (!privateKey) {
+      throw new Error("FIREBASE_PRIVATE_KEY is not defined");
+    }
     if (!admin.apps.length) {
       admin.initializeApp(
         {
           credential: admin.credential.cert({
             projectId: this.configService.get<string>("FIREBASE_PROJECT_ID"),
-            privateKey: this.configService
-              .get<string>("FIREBASE_PRIVATE_KEY")
-              .replace(/\\n/g, "\n"),
+            privateKey: privateKey.replace(/\\n/g, "\n"),
             clientEmail: this.configService.get<string>(
               "FIREBASE_CLIENT_EMAIL",
             ),

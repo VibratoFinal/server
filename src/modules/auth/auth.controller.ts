@@ -26,11 +26,9 @@ export class UsersController {
     }
     const idToken = authHeader.split("Bearer ")[1];
     try {
-      // const decodedToken = await this.firebaseService.verifyToken(idToken);
-      // decodedToken 넣어야함
-      const uid = idToken;
-      // 임시 uid
-      const user = await this.usersService.getUser(uid);
+      const decodedToken = await this.firebaseService.verifyToken(idToken);
+
+      const user = await this.usersService.getUser(decodedToken);
       if (!user) {
         throw new UnauthorizedException("User not found");
       }
@@ -57,8 +55,7 @@ export class UsersController {
 
     const idToken = authHeader.split("Bearer ")[1];
     try {
-      // const uid = await this.firebaseService.verifyToken(idToken);
-      const uid = idToken; // 프론트 연결 후 위에 uid사용
+      const uid = await this.firebaseService.verifyToken(idToken);
 
       return this.usersService.joinUser(uid, createUserDTO);
     } catch (error) {
@@ -80,9 +77,7 @@ export class UsersController {
     }
     const idToken = authHeader.split("Bearer ")[1];
     try {
-      // const uid = await this.firebaseService.verifyToken(idToken);
-
-      const uid = idToken; // 프론트 연결 후 위에 uid사용
+      const uid = await this.firebaseService.verifyToken(idToken);
 
       return this.usersService.editUser(uid, userEdit);
     } catch (error) {
