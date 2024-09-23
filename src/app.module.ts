@@ -18,12 +18,15 @@ import { Comments } from "./modules/comments/entity/comments.entity";
 import { LikesComments } from "./modules/likes/entity/likesComment.entity";
 import { LikesReviews } from "./modules/likes/entity/likesReview.entity";
 import { LikesModule } from "./modules/likes/likes.module";
+import { MusicsModule } from "./modules/musics/musics.module";
+import { ChartsModule } from "./modules/charts/charts.module";
 
 @Module({
   imports: [
     UsersModule,
     ConfigModule.forRoot({
       envFilePath: [".development.env"],
+      isGlobal: true,
     }),
     TypeOrmModule.forRoot({
       type: "mariadb",
@@ -43,10 +46,12 @@ import { LikesModule } from "./modules/likes/likes.module";
       ],
       synchronize: true,
     }),
+    MusicsModule,
     FollowsModule,
     ImagesModule,
     FirebaseModule,
     ReivewsModule,
+    ChartsModule,
     CommentsModule,
     LikesModule,
   ],
