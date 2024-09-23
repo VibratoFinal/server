@@ -23,6 +23,7 @@ import { ChartsModule } from "./modules/charts/charts.module";
 import { JwtModule } from "@nestjs/jwt";
 import { APP_FILTER } from "@nestjs/core";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
+import { SearchsModule } from "./modules/searchs/searchs.module";
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
     ChartsModule,
     CommentsModule,
     LikesModule,
+    SearchsModule,
   ],
   controllers: [AppController],
   providers: [
