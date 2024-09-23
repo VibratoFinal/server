@@ -1,4 +1,4 @@
-import { transformArtistsInOthers } from "src/modules/musics/utils/transform";
+import { transformArtistsInOthers } from "@modules/musics/utils/transform";
 import { ChartsDTO } from "../dto/create-charts.dto";
 
 export function transformCharts(items: any[]): ChartsDTO[] {

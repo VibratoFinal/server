@@ -14,13 +14,13 @@ import {
   SearchAllDTO,
   TrackDTO,
 } from "./dto/create-result.dto";
-import { SongsDetailService } from "./songsdetail.service";
+// import { SongsDetailService } from "./songsdetail.service";
 
 @Injectable()
 export class SpotifyService {
   constructor(
     private readonly configService: ConfigService,
-    private readonly songsDetailService: SongsDetailService,
+    // private readonly songsDetailService: SongsDetailService,
   ) {}
 
   public async getAccessToken(): Promise<string> {
@@ -80,10 +80,10 @@ export class SpotifyService {
     });
 
     const tracks = transformTracks(response.data.tracks.items);
-    const tracksInfoPromises = tracks.map(track =>
-      this.songsDetailService.getTracksInfo(track.id),
-    );
-    await Promise.all(tracksInfoPromises);
+    // const tracksInfoPromises = tracks.map(track =>
+    //   this.songsDetailService.getTracksInfo(track.id),
+    // );
+    // await Promise.all(tracksInfoPromises);
 
     return tracks;
   }
