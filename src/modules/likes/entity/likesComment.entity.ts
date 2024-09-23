@@ -1,6 +1,6 @@
 import { Entity, JoinColumn, ManyToOne } from "typeorm";
 import { LikesReviews } from "./likesReview.entity";
-import { Comments } from "src/modules/comments/entity/comments.entity";
+import { Comments } from "@modules/comments/entity/comments.entity";
 
 @Entity()
 export class LikesComments extends LikesReviews {

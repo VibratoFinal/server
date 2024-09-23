@@ -1,5 +1,5 @@
-import { Users } from "src/modules/auth/entity/auth.entity";
-import { Reviews } from "src/modules/reviews/entity/reviews.entity";
+import { Users } from "@modules/auth/entity/auth.entity";
+import { Reviews } from "@modules/reviews/entity/reviews.entity";
 import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()

@@ -1,4 +1,4 @@
-import { Comments } from "src/modules/comments/entity/comments.entity";
+import { Comments } from "@/modules/comments/entity/comments.entity";
 import {
   Column,
   CreateDateColumn,

@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { LikesReviews } from "./entity/likesReview.entity";
 import { Repository } from "typeorm";
 import { LikesComments } from "./entity/likesComment.entity";
-import { Users } from "../auth/entity/auth.entity";
+import { Users } from "@modules/auth/entity/auth.entity";
 import {
   CreateLikesCommentDTO,
   CreateLikesReviewDTO,

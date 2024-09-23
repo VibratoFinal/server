@@ -8,9 +8,7 @@ export class ImagesController {
 
   @Get("profileImage")
   async getProfileImages() {
-    const images = await this.profileImagesService.getAllImages();
-
-    return images;
+    return await this.profileImagesService.getAllImages();
   }
 
   @Post()
