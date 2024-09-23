@@ -6,7 +6,6 @@ import admin from "firebase-admin";
 export class FirebaseService {
   constructor(private readonly configService: ConfigService) {
     const firebaseAppName = "vibrato";
-
     if (!admin.apps.length) {
       admin.initializeApp(
         {
