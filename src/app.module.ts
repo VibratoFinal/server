@@ -18,6 +18,8 @@ import { Comments } from "./modules/comments/entity/comments.entity";
 import { LikesComments } from "./modules/likes/entity/likesComment.entity";
 import { LikesReviews } from "./modules/likes/entity/likesReview.entity";
 import { LikesModule } from "./modules/likes/likes.module";
+import { MusicsModule } from "./modules/musics/musics.module";
+import { ChartsModule } from "./modules/charts/charts.module";
 import { JwtModule } from "@nestjs/jwt";
 import { APP_FILTER } from "@nestjs/core";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
@@ -27,6 +29,7 @@ import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
     UsersModule,
     ConfigModule.forRoot({
       envFilePath: [".development.env"],
+      isGlobal: true,
     }),
     TypeOrmModule.forRoot({
       type: "mariadb",
@@ -46,6 +49,7 @@ import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
       ],
       synchronize: true,
     }),
+    MusicsModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET_KEY, // 비밀 키
       signOptions: { expiresIn: "10s" }, // 만료 시간
@@ -54,6 +58,7 @@ import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
     ImagesModule,
     FirebaseModule,
     ReivewsModule,
+    ChartsModule,
     CommentsModule,
     LikesModule,
   ],
