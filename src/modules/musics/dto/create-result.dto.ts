@@ -1,4 +1,11 @@
-import { IsArray, IsDate, IsNumber, IsString, IsUrl } from "class-validator";
+import {
+  IsArray,
+  IsBoolean,
+  IsDate,
+  IsNumber,
+  IsString,
+  IsUrl,
+} from "class-validator";
 
 export class TrackDTO {
   @IsString()
@@ -6,6 +13,9 @@ export class TrackDTO {
 
   @IsString()
   name: string;
+
+  @IsArray()
+  artists_name: string[];
 
   @IsUrl()
   spotify_url: string;
@@ -20,7 +30,7 @@ export class TrackDTO {
   album_name: string;
 
   @IsUrl()
-  album_image: string;
+  image_url: string;
 
   @IsUrl()
   album_spotify_url: string;
@@ -28,11 +38,20 @@ export class TrackDTO {
   @IsDate()
   release_date: Date;
 
+  @IsNumber()
+  duration: number;
+
   @IsArray()
-  album_artists: ArtistDTO[];
+  album_artists: ArtistOtherDTO[];
 
   @IsNumber()
-  rated: number;
+  avg_rated: number;
+
+  @IsNumber()
+  count_rated: number;
+
+  @IsBoolean()
+  liked: boolean;
 }
 
 export class ArtistDTO {
@@ -46,13 +65,19 @@ export class ArtistDTO {
   spotify_url: string;
 
   @IsUrl()
-  image?: string;
+  image_url: string;
 
   @IsString()
-  genres?: string;
+  genres: string;
 
   @IsNumber()
-  rated?: number;
+  avg_rated: number;
+
+  @IsNumber()
+  count_rated: number;
+
+  @IsBoolean()
+  liked: boolean;
 }
 
 export class AlbumDTO {
@@ -62,8 +87,11 @@ export class AlbumDTO {
   @IsString()
   name: string;
 
+  @IsArray()
+  artists_name: string[];
+
   @IsUrl()
-  image: string;
+  image_url: string;
 
   @IsNumber()
   total_tracks: number;
@@ -72,10 +100,16 @@ export class AlbumDTO {
   release_date: Date;
 
   @IsArray()
-  album_artists: ArtistDTO[];
+  album_artists: ArtistOtherDTO[];
 
   @IsNumber()
-  rated: number;
+  avg_rated: number;
+
+  @IsNumber()
+  count_rated: number;
+
+  @IsBoolean()
+  liked: boolean;
 }
 
 export class SearchAllDTO {
@@ -87,4 +121,21 @@ export class SearchAllDTO {
 
   @IsArray()
   albums: AlbumDTO[];
+}
+
+export class ArtistOtherDTO {
+  @IsString()
+  id: string;
+
+  @IsString()
+  name: string;
+
+  @IsUrl()
+  spotify_url: string;
+
+  @IsNumber()
+  avg_rated: number;
+
+  @IsBoolean()
+  liked: boolean;
 }
