@@ -2,7 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { CommentsService } from "@modules/comments/comments.service";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { Comments } from "./entity/comments.entity";
-import { ProfileImages } from "../profile/entity/profile-images.entity";
+import { Reviews } from "../reviews/entity/reviews.entity";
 
 describe("CommentsService", () => {
   let service: CommentsService;
@@ -16,7 +16,7 @@ describe("CommentsService", () => {
           useValue: {},
         },
         {
-          provide: getRepositoryToken(ProfileImages),
+          provide: getRepositoryToken(Reviews),
           useValue: {},
         },
       ],

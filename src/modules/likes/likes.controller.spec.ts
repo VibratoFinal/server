@@ -46,7 +46,7 @@ describe("LikesController", () => {
       const mockLike: InsertResult = {
         generatedMaps: [],
         raw: {},
-        identifiers: [{ user_uid: "test-uid", review_id: 1 }],
+        identifiers: [{ user_uid: "exampleUID", review_id: 1 }],
       };
 
       jest.spyOn(service, "addLikeReview").mockResolvedValue(mockLike);

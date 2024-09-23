@@ -7,7 +7,7 @@ export class FirebaseService {
   constructor(private readonly configService: ConfigService) {
     const firebaseAppName = "vibrato";
 
-    if (!admin) {
+    if (!admin.apps.length) {
       admin.initializeApp(
         {
           credential: admin.credential.cert({
