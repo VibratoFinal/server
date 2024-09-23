@@ -20,7 +20,6 @@ import { LikesReviews } from "./modules/likes/entity/likesReview.entity";
 import { LikesModule } from "./modules/likes/likes.module";
 import { MusicsModule } from "./modules/musics/musics.module";
 import { ChartsModule } from "./modules/charts/charts.module";
-import { JwtModule } from "@nestjs/jwt";
 import { APP_FILTER } from "@nestjs/core";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { SearchsModule } from "./modules/searchs/searchs.module";
@@ -51,10 +50,6 @@ import { SearchsModule } from "./modules/searchs/searchs.module";
       synchronize: true,
     }),
     MusicsModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET_KEY, // 비밀 키
-      signOptions: { expiresIn: "10s" }, // 만료 시간
-    }),
     FollowsModule,
     ImagesModule,
     FirebaseModule,

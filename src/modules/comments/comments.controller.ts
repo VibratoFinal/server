@@ -13,10 +13,7 @@ import { CreateCommentDTO } from "./dto/create-comments.dto";
 
 @Controller("review")
 export class CommentsController {
-  constructor(
-    // private readonly usersService: UsersService  // uid 사용할 때 사용할 것
-    private readonly commentsService: CommentsService,
-  ) {}
+  constructor(private readonly commentsService: CommentsService) {}
   @Post(":review_id/comments")
   async addComment(
     @Headers("Authorization") authHeader: string,
