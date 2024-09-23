@@ -1,11 +1,6 @@
-import { Users } from "src/modules/auth/entity/auth.entity";
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from "typeorm";
+import { Users } from "@modules/auth/entity/auth.entity";
+import { Reviews } from "@modules/reviews/entity/reviews.entity";
+import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class LikesReviews {
@@ -16,6 +11,10 @@ export class LikesReviews {
   @JoinColumn({ name: "user_uid" })
   user_uid: Users;
 
-  @Column()
+  @ManyToOne(() => Reviews, review => review.review_id, {
+    eager: true,
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({ name: "review_id" })
   review_id: number;
 }

@@ -55,6 +55,7 @@ export class SpotifyService {
         type: "track,artist,album",
         market: "KR",
         limit: "20",
+        offset: "5",
       },
     });
 
@@ -74,6 +75,7 @@ export class SpotifyService {
         type: "track",
         market: "KR",
         limit: "20",
+        offset: "5",
       },
     });
 
@@ -99,6 +101,7 @@ export class SpotifyService {
         type: "artist",
         market: "KR",
         limit: "20",
+        offset: "5",
       },
     });
 

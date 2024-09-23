@@ -1,4 +1,4 @@
-import { Reviews } from "src/modules/reviews/entity/reviews.entity";
+import { Reviews } from "@modules/reviews/entity/reviews.entity";
 import {
   Column,
   CreateDateColumn,

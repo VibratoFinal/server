@@ -8,8 +8,8 @@ import { Users } from "./modules/auth/entity/auth.entity";
 import { FollowsModule } from "./modules/follows/follows.module";
 import { Follows } from "./modules/follows/entity/follows.entity";
 import { ImagesModule } from "./modules/profile/profile-images.module";
-import { FirebaseService } from "./config/firebase/firebase.service";
-import { FirebaseModule } from "./config/firebase/firebase.module";
+import { FirebaseService } from "./configs/firebase/firebase.service";
+import { FirebaseModule } from "./configs/firebase/firebase.module";
 import { ProfileImages } from "./modules/profile/entity/profile-images.entity";
 import { ReivewsModule } from "./modules/reviews/reviews.module";
 import { Reviews } from "./modules/reviews/entity/reviews.entity";
@@ -20,6 +20,9 @@ import { LikesReviews } from "./modules/likes/entity/likesReview.entity";
 import { LikesModule } from "./modules/likes/likes.module";
 import { MusicsModule } from "./modules/musics/musics.module";
 import { ChartsModule } from "./modules/charts/charts.module";
+import { JwtModule } from "@nestjs/jwt";
+import { APP_FILTER } from "@nestjs/core";
+import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 
 @Module({
   imports: [
@@ -47,6 +50,10 @@ import { ChartsModule } from "./modules/charts/charts.module";
       synchronize: true,
     }),
     MusicsModule,
+    JwtModule.register({
+      secret: process.env.JWT_SECRET_KEY, // 비밀 키
+      signOptions: { expiresIn: "10s" }, // 만료 시간
+    }),
     FollowsModule,
     ImagesModule,
     FirebaseModule,
@@ -56,6 +63,13 @@ import { ChartsModule } from "./modules/charts/charts.module";
     LikesModule,
   ],
   controllers: [AppController],
-  providers: [AppService, FirebaseService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+    FirebaseService,
+  ],
 })
 export class AppModule {}
