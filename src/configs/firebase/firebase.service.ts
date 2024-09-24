@@ -7,7 +7,7 @@ export class FirebaseService {
   constructor(private readonly configService: ConfigService) {
     const firebaseAppName = "vibrato";
     const privateKey = this.configService.get<string>("FIREBASE_PRIVATE_KEY");
-
+    const ex = privateKey.replace(/\\n/gm, "\n");
     if (!privateKey) {
       throw new Error("FIREBASE_PRIVATE_KEY is not defined");
     }
@@ -26,6 +26,8 @@ export class FirebaseService {
       );
     } else {
       console.log("Firebase app already initialized");
+      console.log("privateKey", privateKey);
+      console.log("privateKey replace", ex);
     }
   }
   async verifyToken(token: string) {
