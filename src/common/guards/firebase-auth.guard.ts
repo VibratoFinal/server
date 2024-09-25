@@ -1,4 +1,3 @@
-// src/auth/firebase-auth.guard.ts
 import {
   Injectable,
   CanActivate,
@@ -17,7 +16,9 @@ export class FirebaseAuthGuard implements CanActivate {
     const idToken = this.extractToken(request.headers["authorization"]);
 
     // Firebase 토큰 검증
-    await this.verifyToken(idToken, request);
+    const decodedToken = await this.verifyToken(idToken);
+    request.user = decodedToken;
+    console.log("인증 성공");
 
     return true; // 인증 성공
   }
@@ -29,13 +30,21 @@ export class FirebaseAuthGuard implements CanActivate {
     return authHeader.split("Bearer ")[1];
   }
 
-  private async verifyToken(idToken: string, request: any) {
+  private async verifyToken(idToken: string) {
     try {
-      const decodedToken = await this.firebaseService.verifyToken(idToken);
-      request.user = decodedToken; // 요청 객체에 사용자 정보 추가
+      const decodedToken =
+        await this.firebaseService.admin.verifyIdToken(idToken);
+      console.log(decodedToken);
+
+      console.log("디코딩 성공");
+
+      return decodedToken;
     } catch (error) {
-      console.log(error);
-      throw new HttpException("Unauthorized", HttpStatus.UNAUTHORIZED);
+      console.error("Firebase ID token verification failed:", error);
+      throw new HttpException(
+        "Unauthorized: Invalid or expired ID token",
+        HttpStatus.UNAUTHORIZED,
+      );
     }
   }
 }

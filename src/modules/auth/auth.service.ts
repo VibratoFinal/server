@@ -5,6 +5,11 @@ import { Users } from "./entity/auth.entity";
 import { CreateUserDTO } from "./dto/create-user.dto";
 import { ProfileImages } from "@modules/profile/entity/profile-images.entity";
 
+export class UserResponseDTO {
+  profileImageId: number;
+  nickname: string;
+}
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -15,19 +20,30 @@ export class UsersService {
     private profileimagesRepository: Repository<ProfileImages>,
   ) {}
 
-  async getUser(uid: string): Promise<Users | null> {
-    return await this.userRepository.findOne({ where: { uid } });
+  async getUser(uid: string): Promise<UserResponseDTO | null> {
+    console.log(uid);
+
+    const user = await this.userRepository.findOne({
+      where: { uid },
+      relations: ["profileImage"],
+    });
+    if (!user) {
+      return null;
+    }
+    const profileImageId = user.profileImage ? user.profileImage.id : null;
+    return {
+      profileImageId,
+      nickname: user.nickname,
+    };
   }
 
   async joinUser(uid: string, user: CreateUserDTO): Promise<InsertResult> {
     const profileImage = await this.profileimagesRepository.findOne({
       where: { id: user.profileImageId },
     });
-
     if (!profileImage) {
       throw new Error("Profile image not found");
     }
-
     return await this.userRepository.insert({
       uid: uid,
       profileImage: profileImage,

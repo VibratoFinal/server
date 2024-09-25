@@ -10,7 +10,7 @@ import { tap } from "rxjs/operators";
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const { method, url } = context.getArgByIndex(0);
+    const { url } = context.getArgByIndex(0);
     const localDate = new Date(+new Date() + 3240 * 10000)
       .toISOString()
       .replace("T", " ")
