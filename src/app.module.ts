@@ -20,9 +20,10 @@ import { LikesReviews } from "./modules/likes/entity/likesReview.entity";
 import { LikesModule } from "./modules/likes/likes.module";
 import { MusicsModule } from "./modules/musics/musics.module";
 import { ChartsModule } from "./modules/charts/charts.module";
-import { APP_FILTER } from "@nestjs/core";
+import { APP_FILTER, APP_GUARD } from "@nestjs/core";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { SearchsModule } from "./modules/searchs/searchs.module";
+import { FirebaseAuthGuard } from "./common/guards/firebase-auth.guard";
 
 @Module({
   imports: [
@@ -67,6 +68,11 @@ import { SearchsModule } from "./modules/searchs/searchs.module";
       useClass: HttpExceptionFilter,
     },
     FirebaseService,
+    {
+      provide: APP_GUARD,
+      useClass: FirebaseAuthGuard,
+    },
   ],
+  exports: [FirebaseService],
 })
 export class AppModule {}
