@@ -12,18 +12,34 @@ export class MusicsService {
   constructor(private readonly spotifyService: SpotifyService) {}
 
   public async searchAll(body: string): Promise<SearchAllDTO> {
-    return this.spotifyService.searchAll(body);
+    try {
+      return this.spotifyService.searchAll(body);
+    } catch (err) {
+      console.error("Failed to Search All : ", err);
+    }
   }
 
   public async searchTrack(body: string): Promise<TrackDTO[]> {
-    return this.spotifyService.searchTrack(body);
+    try {
+      return this.spotifyService.searchTrack(body);
+    } catch (err) {
+      console.error("Failed to Search Track : ", err);
+    }
   }
 
   public async searchArtist(body: string): Promise<ArtistDTO[]> {
-    return this.spotifyService.searchArtist(body);
+    try {
+      return this.spotifyService.searchArtist(body);
+    } catch (err) {
+      console.error("Failed to Search Track : ", err);
+    }
   }
 
   public async searchAlbum(body: string): Promise<AlbumDTO[]> {
-    return this.spotifyService.searchAlbum(body);
+    try {
+      return this.spotifyService.searchAlbum(body);
+    } catch (err) {
+      console.error("Failed to Search Album : ", err);
+    }
   }
 }
