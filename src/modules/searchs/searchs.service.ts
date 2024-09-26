@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { SpotifyService } from "../musics/spotify.service";
 import axios from "axios";
 import {
@@ -26,6 +26,14 @@ export class SearchsService {
       return transformArtist(response.data);
     } catch (err) {
       console.error("Failed to Get Artist by Id : ", err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: "Failed to get artist by id",
+          details: err.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -43,6 +51,14 @@ export class SearchsService {
       return transformAlbum(response.data);
     } catch (err) {
       console.error("Failed to Get Album by Id : ", err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: "Failed to get album by id",
+          details: err.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -60,6 +76,14 @@ export class SearchsService {
       return transformTrack(response.data);
     } catch (err) {
       console.error("Failed to Get Track by Id : ", err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: "Failed to get track by id",
+          details: err.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }
