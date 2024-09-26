@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import {
   AlbumDTO,
   ArtistDTO,
@@ -16,6 +16,14 @@ export class MusicsService {
       return this.spotifyService.searchAll(body);
     } catch (err) {
       console.error("Failed to Search All : ", err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: "Failed to search all",
+          details: err.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -24,6 +32,14 @@ export class MusicsService {
       return this.spotifyService.searchTrack(body);
     } catch (err) {
       console.error("Failed to Search Track : ", err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: "Failed to search track",
+          details: err.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -31,7 +47,15 @@ export class MusicsService {
     try {
       return this.spotifyService.searchArtist(body);
     } catch (err) {
-      console.error("Failed to Search Track : ", err);
+      console.error("Failed to Search Artist : ", err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: "Failed to search artist",
+          details: err.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -40,6 +64,14 @@ export class MusicsService {
       return this.spotifyService.searchAlbum(body);
     } catch (err) {
       console.error("Failed to Search Album : ", err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: "Failed to search album",
+          details: err.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

@@ -6,13 +6,28 @@ import {
   HttpStatus,
 } from "@nestjs/common";
 import { FirebaseService } from "@/configs/firebase/firebase.service";
+import { Reflector } from "@nestjs/core";
+import { SKIP_AUTH_KEY } from "../decorators/skip-auth.decorator";
 
 @Injectable()
 export class FirebaseAuthGuard implements CanActivate {
-  constructor(private readonly firebaseService: FirebaseService) {}
+  constructor(
+    private readonly firebaseService: FirebaseService,
+    private readonly reflector: Reflector,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
+
+    // Firebase 인증 생략
+    const skipAuth = this.reflector.get<boolean>(
+      SKIP_AUTH_KEY,
+      context.getHandler(),
+    );
+    if (skipAuth) {
+      return true;
+    }
+
     const idToken = this.extractToken(request.headers["authorization"]);
 
     // Firebase 토큰 검증

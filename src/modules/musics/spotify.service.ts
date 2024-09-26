@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import axios from "axios";
 import * as qs from "qs";
@@ -60,13 +60,20 @@ export class SpotifyService {
           type: "track,artist,album",
           market: "KR",
           limit: "20",
-          offset: "5",
         },
       });
 
       return transformAll(response.data);
     } catch (err) {
       console.error("Failed to Search Spotify All : ", err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: "Failed to search spotify all",
+          details: err.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -84,7 +91,6 @@ export class SpotifyService {
           type: "track",
           market: "KR",
           limit: "20",
-          offset: "5",
         },
       });
 
@@ -97,6 +103,14 @@ export class SpotifyService {
       return tracks;
     } catch (err) {
       console.error("Failed to Search Spotify Track : ", err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: "Failed to search spotify track",
+          details: err.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -114,13 +128,20 @@ export class SpotifyService {
           type: "artist",
           market: "KR",
           limit: "20",
-          offset: "5",
         },
       });
 
       return transformArtists(response.data.artists.items);
     } catch (err) {
       console.error("Failed to Search Spotify Artist : ", err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: "Failed to search spotify artist",
+          details: err.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -136,12 +157,22 @@ export class SpotifyService {
         params: {
           q: body,
           type: "album",
+          market: "KR",
+          limit: "20",
         },
       });
 
       return transformAlbums(response.data.albums.items);
     } catch (err) {
       console.error("Failed to Search Spotify Album : ", err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: "Failed to search spotify album",
+          details: err.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }
