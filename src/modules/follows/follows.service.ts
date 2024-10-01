@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Follows } from "./entity/follows.entity";
 import { Repository } from "typeorm";
@@ -19,37 +19,41 @@ export class FollowsService {
     private usersRepository: Repository<Users>,
   ) {}
 
-  async addFollow(uid: string, createFollowDTO: CreateFollowDTO) {
-    try {
-      const { type_id } = createFollowDTO;
-      const user = await this.usersRepository.findOne({ where: { uid } });
-      if (!user) {
-        throw new Error("User not found");
-      }
+  private async findUserByid(uid: string): Promise<Users> {
+    const user = await this.usersRepository.findOne({ where: { uid } });
+    if (!user) {
+      throw new HttpException("User not found", HttpStatus.NOT_FOUND);
+    }
 
+    return user;
+  }
+
+  async addFollow(uid: string, createFollowDTO: CreateFollowDTO) {
+    const { type_id } = createFollowDTO;
+    const user = await this.findUserByid(uid);
+    try {
       return await this.followRepository.insert({
         user_uid: user,
         type_id,
       });
     } catch (error) {
-      throw new Error(error);
+      if (error.code === "ER_DUP_ENTRY") {
+        throw new HttpException("Already following", HttpStatus.CONFLICT);
+      }
     }
   }
 
   async deleteFollow(uid: string, createFollowDTO: CreateFollowDTO) {
-    try {
-      const { type_id } = createFollowDTO;
-      const user = await this.usersRepository.findOne({ where: { uid } });
-      if (!user) {
-        throw new Error("User not found");
-      }
+    const { type_id } = createFollowDTO;
+    const user = await this.findUserByid(uid);
 
-      return await this.followRepository.delete({
-        user_uid: user,
-        type_id,
-      });
-    } catch (error) {
-      throw new Error(error);
+    const deleteFollow = await this.followRepository.delete({
+      user_uid: user,
+      type_id,
+    });
+
+    if (deleteFollow.affected === 0) {
+      throw new HttpException("Follow not found", HttpStatus.NOT_FOUND);
     }
   }
 }

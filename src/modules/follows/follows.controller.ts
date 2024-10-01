@@ -1,30 +1,38 @@
-import { Controller, Delete, Headers, Post, Body } from "@nestjs/common";
+import {
+  Controller,
+  Delete,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+} from "@nestjs/common";
 import { FollowsService } from "./follows.service";
 import { CreateFollowDTO } from "./dto/create-follows.dto";
+import { FirebaseAuthGuard } from "@/common/guards/firebase-auth.guard";
 
 @Controller("follows")
 export class FollowsController {
   constructor(private readonly followsService: FollowsService) {}
 
   @Post()
+  @UseGuards(FirebaseAuthGuard)
   async follow(
-    @Headers("Authorization") authHeader: string,
+    @Request() req,
     @Body()
     createFollowDTO: CreateFollowDTO,
   ) {
-    const uid = authHeader.split("Bearer ")[1];
-    const follow = await this.followsService.addFollow(uid, createFollowDTO);
-    return follow;
+    const { uid } = req.user;
+    return await this.followsService.addFollow(uid, createFollowDTO);
   }
 
   @Delete()
+  @UseGuards(FirebaseAuthGuard)
   async unFollow(
-    @Headers("Authorization") authHeader: string,
+    @Request() req,
     @Body()
     createFollowDTO: CreateFollowDTO,
   ) {
-    const uid = authHeader.split("Bearer ")[1];
-    const follow = await this.followsService.deleteFollow(uid, createFollowDTO);
-    return follow;
+    const { uid } = req.user;
+    return await this.followsService.deleteFollow(uid, createFollowDTO);
   }
 }

@@ -1,8 +1,15 @@
 import { Users } from "@modules/auth/entity/auth.entity";
 import { Reviews } from "@modules/reviews/entity/reviews.entity";
-import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Unique,
+} from "typeorm";
 
 @Entity()
+@Unique(["user_uid", "review_id"])
 export class LikesReviews {
   @PrimaryGeneratedColumn()
   id: number;

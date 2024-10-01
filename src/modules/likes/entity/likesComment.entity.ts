@@ -1,8 +1,9 @@
-import { Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Entity, JoinColumn, ManyToOne, Unique } from "typeorm";
 import { LikesReviews } from "./likesReview.entity";
 import { Comments } from "@modules/comments/entity/comments.entity";
 
 @Entity()
+@Unique(["comment_id"])
 export class LikesComments extends LikesReviews {
   @ManyToOne(() => Comments, comment => comment.comment_id, {
     eager: true,
