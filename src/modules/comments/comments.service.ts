@@ -1,9 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Comments } from "./entity/comments.entity";
 import { Repository } from "typeorm";
 import { CreateCommentDTO } from "./dto/create-comments.dto";
 import { Reviews } from "@modules/reviews/entity/reviews.entity";
+
 // 코멘트 작성 add
 // 수정 edit
 // 전체조회 getAll
@@ -33,7 +34,7 @@ export class CommentsService {
     });
 
     if (!review) {
-      throw new Error("Review not found");
+      throw new HttpException("Review not found", HttpStatus.NOT_FOUND);
     }
 
     return await this.commentRepository.insert({
@@ -43,33 +44,33 @@ export class CommentsService {
     });
   }
 
-  // 해당 리뷰 댓글 전체 조회 (review_id)
+  // 해당 리뷰 댓글 전체 조회
   async getAllComments(reviewId: number): Promise<Comments[]> {
-    return await this.commentRepository.find({
+    const allComments = await this.commentRepository.find({
       where: { review: { review_id: reviewId } },
     });
+
+    if (!allComments.length) {
+      throw new HttpException("Comment not found", HttpStatus.NOT_FOUND);
+    }
+
+    return allComments;
   }
 
-  // 내가 쓴 댓글 조회 (uid)
+  // 내가 쓴 댓글 조회
   async getUserComments(uid: string): Promise<Comments[]> {
     return await this.commentRepository.find({ where: { user_uid: uid } });
   }
 
   // 댓글 수정
   async editComments(
-    commentId: number,
     reviewId: number,
+    commentId: number,
     createCommentDTO: CreateCommentDTO,
     uid: string,
-  ) {
+  ): Promise<void> {
     const { contents } = createCommentDTO;
-    const review = await this.reviewRepository.findOne({
-      where: { review_id: reviewId },
-    });
-
-    if (!review) {
-      throw new Error("Review not found");
-    }
+    await this.findComment(reviewId, commentId, uid);
 
     await this.commentRepository.update(
       { comment_id: commentId, user_uid: uid },
@@ -78,10 +79,35 @@ export class CommentsService {
   }
 
   // 댓글 삭제
-  async deleteComment(commentId: number, uid: string) {
-    return await this.commentRepository.delete({
+  async deleteComment(
+    reviewId: number,
+    commentId: number,
+    uid: string,
+  ): Promise<void> {
+    await this.findComment(reviewId, commentId, uid);
+
+    await this.commentRepository.delete({
       comment_id: commentId,
       user_uid: uid,
     });
+  }
+
+  private async findComment(reviewId: number, commentId: number, uid: string) {
+    const findComment = await this.commentRepository.findOne({
+      where: {
+        review: { review_id: reviewId },
+        comment_id: commentId,
+      },
+    });
+    if (!findComment) {
+      throw new HttpException("Comment not found", HttpStatus.NOT_FOUND);
+    }
+
+    if (findComment.user_uid !== uid) {
+      throw new HttpException(
+        "Forbidden: You do not have permission to delete this comment",
+        HttpStatus.FORBIDDEN,
+      );
+    }
   }
 }

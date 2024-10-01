@@ -3,14 +3,17 @@ import {
   Controller,
   Delete,
   Get,
-  Headers,
   Param,
   Post,
   Put,
+  Request,
+  UseGuards,
 } from "@nestjs/common";
-// import { UsersService } from "src/users/users.service";
 import { ReviewsService } from "./reviews.service";
 import { CreateReviewDTO } from "./dto/create-reviews.dto";
+import { FirebaseAuthGuard } from "@/common/guards/firebase-auth.guard";
+import { SkipAuth } from "@/common/decorators/skip-auth.decorator";
+
 // 리뷰 작성 add
 // 리뷰 전체 조회 getAll
 // 내가 쓴 리뷰 조회 get
@@ -19,72 +22,56 @@ import { CreateReviewDTO } from "./dto/create-reviews.dto";
 
 @Controller("reviews")
 export class ReviewsController {
-  constructor(
-    // private readonly usersService: UsersService  // uid 사용할 때 사용할 것
-    private readonly reviewsService: ReviewsService,
-  ) {}
+  constructor(private readonly reviewsService: ReviewsService) {}
 
   // 리뷰 작성
   @Post()
+  @UseGuards(FirebaseAuthGuard)
   async addReview(
-    @Headers("Authorization") authHeader: string,
+    @Request() req,
     @Body()
     createReviewDTO: CreateReviewDTO,
   ) {
-    try {
-      return this.reviewsService.addReview(authHeader, createReviewDTO);
-    } catch (error) {
-      throw new Error(error);
-    }
+    const { uid } = req.user;
+
+    return this.reviewsService.addReview(uid, createReviewDTO);
   }
 
   // type_id (앨범,트랙,아티스트) 리뷰 전체 조회
   @Get(":type_id")
+  @SkipAuth()
   async getAllReviews(@Param("type_id") typeId: number) {
-    try {
-      return await this.reviewsService.getAllReviews(typeId);
-    } catch (error) {
-      throw new Error(error);
-    }
+    return await this.reviewsService.getAllReviews(typeId);
   }
 
   // 내가 쓴 리뷰 조회
   @Get()
-  async getUserReviews(@Headers("Authorization") authHeader: string) {
-    try {
-      return await this.reviewsService.getUserReviews(authHeader);
-    } catch (error) {
-      throw new Error(error);
-    }
+  @UseGuards(FirebaseAuthGuard)
+  async getUserReviews(@Request() req) {
+    const { uid } = req.user;
+    return await this.reviewsService.getUserReviews(uid);
   }
 
   // 리뷰 수정
   @Put(":review_id")
+  @UseGuards(FirebaseAuthGuard)
   async editReview(
     @Param("review_id") review_id: number,
-    @Headers("Authorization") authHeader: string,
+    @Request() req,
     @Body()
     createReviewDTO: CreateReviewDTO,
   ) {
-    try {
-      await this.reviewsService.editReview(
-        review_id,
-        createReviewDTO,
-        authHeader,
-      );
-      return { message: "Review 수정 완료" };
-    } catch (error) {
-      throw new Error(error);
-    }
+    const { uid } = req.user;
+    await this.reviewsService.editReview(review_id, createReviewDTO, uid);
+    return { message: "Review 수정 완료" };
   }
 
   // 리뷰 삭제
   @Delete(":review_id")
-  async deleteReview(
-    @Param("review_id") review_id: number,
-    @Headers("Authorization") authHeader: string,
-  ) {
-    await this.reviewsService.deleteReview(review_id, authHeader);
+  @UseGuards(FirebaseAuthGuard)
+  async deleteReview(@Param("review_id") review_id: number, @Request() req) {
+    const { uid } = req.user;
+    await this.reviewsService.deleteReview(review_id, uid);
     return { message: "Review 삭제 완료" };
   }
 }

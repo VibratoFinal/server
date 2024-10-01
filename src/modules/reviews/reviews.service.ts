@@ -1,47 +1,49 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Reviews } from "./entity/reviews.entity";
 import { Repository } from "typeorm";
 import { CreateReviewDTO } from "./dto/create-reviews.dto";
+import { Comments } from "../comments/entity/comments.entity";
 
 @Injectable()
 export class ReviewsService {
   constructor(
     @InjectRepository(Reviews)
     private reviewRepository: Repository<Reviews>,
+
+    @InjectRepository(Comments)
+    private commentRepository: Repository<Comments>,
   ) {}
 
   // 리뷰 작성
   async addReview(uid: string, review: CreateReviewDTO) {
-    try {
-      await this.reviewRepository.insert({
-        // 임시 uid임. 프론트 연결 후 review.uid와 연결할 것.
-        user_uid: uid,
-        rated: review.rated,
-        contents: review.contents,
-        type_id: review.type_id,
-      });
-    } catch (error) {
-      throw new Error(error);
-    }
+    await this.reviewRepository.insert({
+      user_uid: uid,
+      rated: review.rated,
+      contents: review.contents,
+      type_id: review.type_id,
+    });
   }
 
   // type_id (트랙,앨범,아티스트) 리뷰 전체 조회
-  async getAllReviews(typeId: number) {
-    try {
-      return await this.reviewRepository.find({ where: { type_id: typeId } });
-    } catch (error) {
-      throw new Error(error);
+  async getAllReviews(typeId: number): Promise<Reviews[]> {
+    const allReviews = await this.reviewRepository.find({
+      where: { type_id: typeId },
+    });
+    if (!allReviews.length) {
+      throw new HttpException("Review not found", HttpStatus.NOT_FOUND);
     }
+    return allReviews;
   }
 
-  // 내가 쓴 리뷰 조회 // UID 필요?
-  async getUserReviews(uid: string) {
-    try {
-      return await this.reviewRepository.find({ where: { user_uid: uid } });
-    } catch (error) {
-      throw new Error(error);
+  async getUserReviews(uid: string): Promise<Reviews[]> {
+    const getUid = await this.reviewRepository.find({
+      where: { user_uid: uid },
+    });
+    if (!getUid.length) {
+      throw new HttpException("User review not found", HttpStatus.NOT_FOUND);
     }
+    return getUid;
   }
 
   // 리뷰 수정
@@ -50,26 +52,55 @@ export class ReviewsService {
     createReviewDTO: CreateReviewDTO,
     uid: string,
   ): Promise<void> {
-    try {
-      const { rated, contents } = createReviewDTO;
-      await this.reviewRepository.update(
-        { review_id: reviewId, user_uid: uid },
-        { rated, contents },
-      );
-    } catch (error) {
-      throw new Error(error);
+    const { rated, contents } = createReviewDTO;
+    await this.findReview(reviewId, uid);
+
+    const updateReivew = await this.reviewRepository.update(
+      { review_id: reviewId, user_uid: uid },
+      { rated, contents },
+    );
+
+    if (updateReivew.affected === 0) {
+      throw new HttpException("Review not found", HttpStatus.NOT_FOUND);
     }
   }
 
   // 리뷰 삭제
-  async deleteReview(reviewId: number, uid: string) {
-    try {
-      return await this.reviewRepository.delete({
+  async deleteReview(reviewId: number, uid: string): Promise<void> {
+    await this.findReview(reviewId, uid);
+
+    const deleteComments = await this.commentRepository.delete({
+      review: { review_id: reviewId },
+    });
+
+    if (deleteComments.affected === 0) {
+      console.log("No comments found for this review");
+    }
+
+    const deleteReview = await this.reviewRepository.delete({
+      review_id: reviewId,
+    });
+
+    if (deleteReview.affected === 0) {
+      throw new HttpException("Review not found", HttpStatus.NOT_FOUND);
+    }
+  }
+
+  private async findReview(reviewId: number, uid: string) {
+    const findReview = await this.reviewRepository.findOne({
+      where: {
         review_id: reviewId,
-        user_uid: uid,
-      });
-    } catch (error) {
-      throw new Error(error);
+      },
+    });
+    // 리뷰가 존재하지 않는 경우 처리
+    if (!findReview) {
+      throw new HttpException("Review not found", HttpStatus.NOT_FOUND);
+    }
+    if (findReview.user_uid !== uid) {
+      throw new HttpException(
+        "Forbidden: You do not have permission to delete Review",
+        HttpStatus.FORBIDDEN,
+      );
     }
   }
 }
