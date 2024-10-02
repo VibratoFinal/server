@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { LikesReviews } from "./entity/likesReview.entity";
 import { Repository } from "typeorm";
@@ -8,6 +8,8 @@ import {
   CreateLikesCommentDTO,
   CreateLikesReviewDTO,
 } from "./dto/create-likes-dto";
+import { Reviews } from "../reviews/entity/reviews.entity";
+import { Comments } from "../comments/entity/comments.entity";
 
 // 리뷰 좋아요 추가, 삭제
 // 댓글 좋아요 추가, 삭제
@@ -21,27 +23,41 @@ export class LikesService {
     private likesCommentRepository: Repository<LikesComments>,
     @InjectRepository(Users)
     private usersRepository: Repository<Users>,
+
+    @InjectRepository(Reviews)
+    private reviewRepository: Repository<Reviews>,
+
+    @InjectRepository(Comments)
+    private commentRepository: Repository<Comments>,
   ) {}
 
   private async findUserByUid(uid: string): Promise<Users> {
     const user = await this.usersRepository.findOne({ where: { uid } });
     if (!user) {
-      throw new NotFoundException("User not found");
+      throw new HttpException("User not found", HttpStatus.NOT_FOUND);
     }
     return user;
   }
 
   async addLikeReview(uid: string, createLikesReviewDTO: CreateLikesReviewDTO) {
-    try {
-      const user = await this.findUserByUid(uid);
-      const { review_id } = createLikesReviewDTO;
+    const { review_id } = createLikesReviewDTO;
 
+    const findReviewId = await this.reviewRepository.find({
+      where: { review_id },
+    });
+    if (!findReviewId.length) {
+      throw new HttpException("review not found", HttpStatus.NOT_FOUND);
+    }
+    const user = await this.findUserByUid(uid);
+    try {
       return await this.likesReviewRepository.insert({
         user_uid: user,
         review_id,
       });
     } catch (error) {
-      throw new Error(`Failed to add like to review: ${error.message}`);
+      if (error.code === "ER_DUP_ENTRY") {
+        throw new HttpException("Already add LikeReview", HttpStatus.CONFLICT);
+      }
     }
   }
 
@@ -49,17 +65,25 @@ export class LikesService {
     uid: string,
     createLikesCommentDTO: CreateLikesCommentDTO,
   ) {
-    try {
-      const user = await this.findUserByUid(uid);
-      const { review_id, comment_id } = createLikesCommentDTO;
+    const { review_id, comment_id } = createLikesCommentDTO;
+    const findCommentId = await this.commentRepository.find({
+      where: { comment_id },
+    });
+    if (!findCommentId.length) {
+      throw new HttpException("Comment not found", HttpStatus.NOT_FOUND);
+    }
 
+    const user = await this.findUserByUid(uid);
+    try {
       return await this.likesCommentRepository.insert({
         user_uid: user,
         review_id,
         comment_id,
       });
     } catch (error) {
-      throw new Error(`Failed to add like to review: ${error.message}`);
+      if (error.code === "ER_DUP_ENTRY") {
+        throw new HttpException("Already add LikeComment", HttpStatus.CONFLICT);
+      }
     }
   }
 
@@ -67,34 +91,35 @@ export class LikesService {
     uid: string,
     createLikesReviewDTO: CreateLikesReviewDTO,
   ) {
-    try {
-      const user = await this.findUserByUid(uid);
-      const { review_id } = createLikesReviewDTO;
+    const user = await this.findUserByUid(uid);
+    const { review_id } = createLikesReviewDTO;
 
-      return await this.likesReviewRepository.delete({
-        user_uid: user,
-        review_id,
-      });
-    } catch (error) {
-      throw new Error(`Failed to remove like to review: ${error.message}`);
+    const deleteLikeReview = await this.likesReviewRepository.delete({
+      user_uid: user,
+      review_id,
+    });
+
+    if (deleteLikeReview.affected === 0) {
+      throw new HttpException("Like Review Error", HttpStatus.NOT_FOUND);
     }
   }
+  // 테스트 해봐야함
 
   async removeLikeComment(
     uid: string,
     createLikesCommentDTO: CreateLikesCommentDTO,
   ) {
-    try {
-      const user = await this.findUserByUid(uid);
-      const { review_id, comment_id } = createLikesCommentDTO;
+    const user = await this.findUserByUid(uid);
+    const { review_id, comment_id } = createLikesCommentDTO;
 
-      return await this.likesCommentRepository.delete({
-        user_uid: user,
-        review_id,
-        comment_id,
-      });
-    } catch (error) {
-      throw new Error(`Failed to remove like to comment: ${error.message}`);
+    const deleteLikeComment = await this.likesCommentRepository.delete({
+      user_uid: user,
+      review_id,
+      comment_id,
+    });
+
+    if (deleteLikeComment.affected === 0) {
+      throw new HttpException("Like Comment Error", HttpStatus.NOT_FOUND);
     }
   }
 }

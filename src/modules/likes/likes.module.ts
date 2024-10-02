@@ -5,9 +5,21 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { LikesComments } from "./entity/likesComment.entity";
 import { LikesReviews } from "./entity/likesReview.entity";
 import { Users } from "@/modules/auth/entity/auth.entity";
+import { FirebaseModule } from "@/configs/firebase/firebase.module";
+import { Reviews } from "../reviews/entity/reviews.entity";
+import { Comments } from "../comments/entity/comments.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([LikesComments, LikesReviews, Users])],
+  imports: [
+    TypeOrmModule.forFeature([
+      LikesComments,
+      LikesReviews,
+      Users,
+      Reviews,
+      Comments,
+    ]),
+    FirebaseModule,
+  ],
   providers: [LikesService],
   controllers: [LikesController],
 })

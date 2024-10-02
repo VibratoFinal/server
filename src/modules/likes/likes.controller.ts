@@ -1,79 +1,62 @@
-import { Body, Controller, Delete, Headers, Post } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Post,
+  Request,
+  UseGuards,
+} from "@nestjs/common";
 import { LikesService } from "./likes.service";
 import {
   CreateLikesCommentDTO,
   CreateLikesReviewDTO,
 } from "./dto/create-likes-dto";
+import { FirebaseAuthGuard } from "@/common/guards/firebase-auth.guard";
 
 @Controller("likes")
 export class LikesController {
   constructor(private readonly likesService: LikesService) {}
 
   @Post("/review")
+  @UseGuards(FirebaseAuthGuard)
   async addLikeReview(
-    @Headers("Authorization") authHeader: string,
+    @Request() req,
     @Body() createLikesReviewDTO: CreateLikesReviewDTO,
   ) {
-    try {
-      const uid = authHeader.split("Bearer ")[1];
-      const like = await this.likesService.addLikeReview(
-        uid,
-        createLikesReviewDTO,
-      );
-      return like;
-    } catch (error) {
-      throw new Error(error);
-    }
+    const { uid } = req.user;
+    return await this.likesService.addLikeReview(uid, createLikesReviewDTO);
   }
 
   @Post("/review/comment")
+  @UseGuards(FirebaseAuthGuard)
   async addLikeComment(
-    @Headers("Authorization") authHeader: string,
+    @Request() req,
     @Body() createLikesCommentDTO: CreateLikesCommentDTO,
   ) {
-    try {
-      const uid = authHeader.split("Bearer ")[1];
-      const like = await this.likesService.addLikeComment(
-        uid,
-        createLikesCommentDTO,
-      );
-      return like;
-    } catch (error) {
-      throw new Error(error);
-    }
+    const { uid } = req.user;
+    return await this.likesService.addLikeComment(uid, createLikesCommentDTO);
   }
 
   @Delete("/reviews")
+  @UseGuards(FirebaseAuthGuard)
   async removeLikeReview(
-    @Headers("Authorization") authHeader: string,
+    @Request() req,
     @Body() createLikesReviewDTO: CreateLikesReviewDTO,
   ) {
-    try {
-      const uid = authHeader.split("Bearer ")[1];
-      const like = await this.likesService.removeLikeReview(
-        uid,
-        createLikesReviewDTO,
-      );
-      return like;
-    } catch (error) {
-      throw new Error(error);
-    }
+    const { uid } = req.user;
+    return await this.likesService.removeLikeReview(uid, createLikesReviewDTO);
   }
 
   @Delete("/reviews/comment")
+  @UseGuards(FirebaseAuthGuard)
   async removeLikeComment(
-    @Headers("Authorization") authHeader: string,
+    @Request() req,
     @Body() createLikesCommentDTO: CreateLikesCommentDTO,
   ) {
-    try {
-      const uid = authHeader.split("Bearer ")[1];
-      const like = await this.likesService.removeLikeComment(
-        uid,
-        createLikesCommentDTO,
-      );
-      return like;
-    } catch (error) {
-      throw new Error(error);
-    }
+    const { uid } = req.user;
+    return await this.likesService.removeLikeComment(
+      uid,
+      createLikesCommentDTO,
+    );
   }
 }
