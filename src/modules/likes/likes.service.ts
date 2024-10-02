@@ -103,6 +103,7 @@ export class LikesService {
       throw new HttpException("Like Review Error", HttpStatus.NOT_FOUND);
     }
   }
+  // 테스트 해봐야함
 
   async removeLikeComment(
     uid: string,
