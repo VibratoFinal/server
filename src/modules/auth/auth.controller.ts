@@ -2,11 +2,9 @@ import {
   Body,
   Controller,
   Get,
-  Headers,
   Request,
   Post,
   Put,
-  UnauthorizedException,
   UseGuards,
 } from "@nestjs/common";
 import { UsersService } from "./auth.service";
@@ -21,11 +19,6 @@ export class UsersController {
   @Get("login")
   async getUser(@Request() req) {
     const { uid } = req.user;
-    console.log(uid);
-
-    if (!uid) {
-      throw new UnauthorizedException("User not found");
-    }
 
     return await this.usersService.getUser(uid);
   }
@@ -38,31 +31,15 @@ export class UsersController {
     createUserDTO: CreateUserDTO,
   ) {
     const { uid } = req.user;
-    if (!uid) {
-      throw new UnauthorizedException("User not found");
-    }
 
     return await this.usersService.joinUser(uid, createUserDTO);
   }
 
   @UseGuards(FirebaseAuthGuard)
   @Put("edit")
-  async editUser(
-    @Headers("Authorization") authHeader: string,
-    @Body() userEdit: CreateUserDTO,
-  ) {
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      throw new UnauthorizedException(
-        "Authorization header is missing or invalid",
-      );
-    }
+  async editUser(@Request() req, @Body() userEdit: CreateUserDTO) {
+    const { uid } = req.user;
 
-    try {
-      return this.usersService.editUser(authHeader, userEdit);
-    } catch (error) {
-      throw new UnauthorizedException(
-        `Invalid Firebase Token: ${error.message}`,
-      );
-    }
+    return await this.usersService.editUser(uid, userEdit);
   }
 }

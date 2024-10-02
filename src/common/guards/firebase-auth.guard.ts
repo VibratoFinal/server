@@ -8,6 +8,11 @@ import {
 import { FirebaseService } from "@/configs/firebase/firebase.service";
 import { Reflector } from "@nestjs/core";
 import { SKIP_AUTH_KEY } from "../decorators/skip-auth.decorator";
+import { Request } from "express";
+
+interface CustomRequest extends Request {
+  user?: any;
+}
 
 @Injectable()
 export class FirebaseAuthGuard implements CanActivate {
@@ -17,7 +22,8 @@ export class FirebaseAuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
+    const request: CustomRequest = context.switchToHttp().getRequest();
+    const authHeader = request.headers["authorization"];
 
     // Firebase 인증 생략
     const skipAuth = this.reflector.get<boolean>(
@@ -28,7 +34,7 @@ export class FirebaseAuthGuard implements CanActivate {
       return true;
     }
 
-    const idToken = this.extractToken(request.headers["authorization"]);
+    const idToken = this.extractToken(authHeader);
 
     // Firebase 토큰 검증
     const decodedToken = await this.verifyToken(idToken);
@@ -40,7 +46,10 @@ export class FirebaseAuthGuard implements CanActivate {
 
   private extractToken(authHeader: string): string {
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      throw new HttpException("Unauthorized", HttpStatus.UNAUTHORIZED);
+      throw new HttpException(
+        "Unauthorized: Missing or invalid authorization header",
+        HttpStatus.UNAUTHORIZED,
+      );
     }
     return authHeader.split("Bearer ")[1];
   }
@@ -56,8 +65,22 @@ export class FirebaseAuthGuard implements CanActivate {
       return decodedToken;
     } catch (error) {
       console.error("Firebase ID token verification failed:", error);
+      if (error.code === "auth/id-token-expired") {
+        throw new HttpException(
+          "Unauthorized: ID token has expired",
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+
+      if (error.code === "auth/invalid-id-token") {
+        throw new HttpException(
+          "Unauthorized: Invalid ID token",
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+
       throw new HttpException(
-        "Unauthorized: Invalid or expired ID token",
+        "Unauthorized: ID token verification failed",
         HttpStatus.UNAUTHORIZED,
       );
     }
