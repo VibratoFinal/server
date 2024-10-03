@@ -120,6 +120,10 @@ export class ChartsService {
   public async getKoreaRecent(body: LimitDTO): Promise<ChartsDTO[]> {
     try {
       const accessToken = await this.spotifyService.getAccessToken();
+
+      const limit =
+        typeof body.limit === "string" ? parseInt(body.limit, 10) : body.limit;
+
       const url =
         "https://api.spotify.com/v1/playlists/37i9dQZF1DXe5W6diBL5N4/tracks";
       const response = await axios.get(url, {
@@ -127,7 +131,7 @@ export class ChartsService {
           Authorization: `Bearer ${accessToken}`,
         },
         params: {
-          limit: body.limit,
+          limit: limit,
         },
       });
 
