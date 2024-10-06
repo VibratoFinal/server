@@ -1,16 +1,15 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { SpotifyService } from "../musics/spotify.service";
 import axios from "axios";
-import {
-  transformAlbum,
-  transformArtist,
-  transformTrack,
-} from "./util/transform";
 import { AlbumDTO, ArtistDTO, TrackDTO } from "./dto/create-search.dto";
+import { SearchsRepository } from "./searchs.repository";
 
 @Injectable()
 export class SearchsService {
-  constructor(private readonly spotifyService: SpotifyService) {}
+  constructor(
+    private readonly spotifyService: SpotifyService,
+    private readonly searchRepository: SearchsRepository,
+  ) {}
 
   public async getArtist(artist_id: string): Promise<ArtistDTO> {
     try {
@@ -23,7 +22,10 @@ export class SearchsService {
         },
       });
 
-      return transformArtist(response.data);
+      return await this.searchRepository.transformArtist(
+        response.data,
+        artist_id,
+      );
     } catch (err) {
       console.error("Failed to Get Artist by Id : ", err);
       throw new HttpException(
@@ -48,7 +50,10 @@ export class SearchsService {
         },
       });
 
-      return transformAlbum(response.data);
+      return await this.searchRepository.transformAlbum(
+        response.data,
+        album_id,
+      );
     } catch (err) {
       console.error("Failed to Get Album by Id : ", err);
       throw new HttpException(
@@ -73,7 +78,10 @@ export class SearchsService {
         },
       });
 
-      return transformTrack(response.data);
+      return await this.searchRepository.transformTrack(
+        response.data,
+        track_id,
+      );
     } catch (err) {
       console.error("Failed to Get Track by Id : ", err);
       throw new HttpException(
