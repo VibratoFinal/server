@@ -2,7 +2,6 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { UsersService } from "@modules/auth/auth.service";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { Users } from "./entity/auth.entity";
-import { ProfileImages } from "../profile/entity/profile-images.entity";
 
 describe("UsersService", () => {
   let service: UsersService;
@@ -13,10 +12,6 @@ describe("UsersService", () => {
         UsersService,
         {
           provide: getRepositoryToken(Users),
-          useValue: {},
-        },
-        {
-          provide: getRepositoryToken(ProfileImages),
           useValue: {},
         },
       ],

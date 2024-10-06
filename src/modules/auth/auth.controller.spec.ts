@@ -5,7 +5,6 @@ import { FirebaseService } from "@/configs/firebase/firebase.service";
 // import { InsertResult, UpdateResult } from "typeorm";
 import { Users } from "./entity/auth.entity";
 import { getRepositoryToken } from "@nestjs/typeorm";
-import { ProfileImages } from "../profile/entity/profile-images.entity";
 
 describe("UsersController", () => {
   let controller: UsersController;
@@ -22,7 +21,6 @@ describe("UsersController", () => {
         UsersService,
         { provide: FirebaseService, useValue: { mockFirebaseService } },
         { provide: getRepositoryToken(Users), useValue: {} },
-        { provide: getRepositoryToken(ProfileImages), useValue: {} },
       ],
     }).compile();
 
