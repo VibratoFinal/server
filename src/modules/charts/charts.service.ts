@@ -1,16 +1,17 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import axios from "axios";
-import { transformCharts } from "./utils/transform";
 import { ChartsDTO } from "./dto/create-charts.dto";
 import { SpotifyService } from "../musics/spotify.service";
 import { LimitDTO } from "./dto/chart-limit.dto";
+import { ChartsRepository } from "./charts.repository";
 
 @Injectable()
 export class ChartsService {
   constructor(
     private readonly configService: ConfigService,
     private readonly spotifyService: SpotifyService,
+    private readonly chartsRepository: ChartsRepository,
   ) {}
 
   public async getGlobal50(): Promise<ChartsDTO[]> {
@@ -24,7 +25,9 @@ export class ChartsService {
         },
       });
 
-      const charts = transformCharts(response.data.items);
+      const charts = await this.chartsRepository.transformCharts(
+        response.data.items,
+      );
       return charts;
     } catch (err) {
       console.error("Failed to Get Global 50 : ", err);
@@ -50,7 +53,9 @@ export class ChartsService {
         },
       });
 
-      const charts = transformCharts(response.data.items);
+      const charts = await this.chartsRepository.transformCharts(
+        response.data.items,
+      );
       return charts;
     } catch (err) {
       console.error("Failed to Get Korea 50 : ", err);
@@ -76,7 +81,9 @@ export class ChartsService {
         },
       });
 
-      const charts = transformCharts(response.data.items);
+      const charts = await this.chartsRepository.transformCharts(
+        response.data.items,
+      );
       return charts;
     } catch (err) {
       console.error("Failed to Get Global 50 Week : ", err);
@@ -102,7 +109,9 @@ export class ChartsService {
         },
       });
 
-      const charts = transformCharts(response.data.items);
+      const charts = await this.chartsRepository.transformCharts(
+        response.data.items,
+      );
       return charts;
     } catch (err) {
       console.error("Failed to Get Korea 50 Week : ", err);
@@ -135,7 +144,9 @@ export class ChartsService {
         },
       });
 
-      const charts = transformCharts(response.data.items);
+      const charts = await this.chartsRepository.transformCharts(
+        response.data.items,
+      );
       return charts;
     } catch (err) {
       console.error("Failed to Get Korea Recent : ", err);
@@ -164,7 +175,9 @@ export class ChartsService {
         },
       });
 
-      const charts = transformCharts(response.data.items);
+      const charts = await this.chartsRepository.transformCharts(
+        response.data.items,
+      );
       return charts;
     } catch (err) {
       console.error("Failed to Get Anima R&B : ", err);

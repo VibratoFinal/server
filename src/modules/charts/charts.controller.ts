@@ -48,4 +48,10 @@ export class ChartsController {
   async animarnb(@Body() body: LimitDTO): Promise<ChartsDTO[]> {
     return this.chartsService.getAnimaRnB(body);
   }
+
+  @Get("genres/animarnb_query")
+  @SkipAuth()
+  async animarnbByQuery(@Query() query: LimitDTO): Promise<ChartsDTO[]> {
+    return this.chartsService.getAnimaRnB(query);
+  }
 }
