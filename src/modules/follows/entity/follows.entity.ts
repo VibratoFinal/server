@@ -19,5 +19,5 @@ export class Follows {
   user_uid: Users;
 
   @Column()
-  type_id: number;
+  type_id: string;
 }
