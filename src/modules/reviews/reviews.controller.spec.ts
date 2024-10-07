@@ -19,6 +19,7 @@ describe("ReviewsController", () => {
         { provide: getRepositoryToken(Reviews), useValue: {} },
         { provide: getRepositoryToken(Comments), useValue: {} },
       ],
+      exports: [ReviewsService],
     }).compile();
 
     controller = module.get<ReviewsController>(ReviewsController);
