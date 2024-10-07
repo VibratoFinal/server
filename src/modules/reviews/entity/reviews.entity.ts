@@ -23,7 +23,7 @@ export class Reviews {
   contents: string;
 
   @Column()
-  type_id: number;
+  type_id: string;
 
   @CreateDateColumn()
   created_at: Date;
