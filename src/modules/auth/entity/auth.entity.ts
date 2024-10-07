@@ -1,10 +1,7 @@
-import { ProfileImages } from "../../profile/entity/profile-images.entity";
 import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
-  ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 
@@ -16,9 +13,8 @@ export class Users {
   @Column({ type: "varchar", unique: true, comment: "유저 아이디" })
   uid: string;
 
-  @ManyToOne(() => ProfileImages, { eager: true, nullable: false })
-  @JoinColumn({ name: "profile_image_id" })
-  profileImage: ProfileImages;
+  @Column({ type: "varchar", comment: "유저 이미지" })
+  profileImage: string;
 
   @Column({ type: "varchar", comment: "유저 닉네임" })
   nickname: string;

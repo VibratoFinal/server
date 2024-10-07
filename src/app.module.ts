@@ -7,10 +7,8 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { Users } from "./modules/auth/entity/auth.entity";
 import { FollowsModule } from "./modules/follows/follows.module";
 import { Follows } from "./modules/follows/entity/follows.entity";
-import { ImagesModule } from "./modules/profile/profile-images.module";
 import { FirebaseService } from "./configs/firebase/firebase.service";
 import { FirebaseModule } from "./configs/firebase/firebase.module";
-import { ProfileImages } from "./modules/profile/entity/profile-images.entity";
 import { ReivewsModule } from "./modules/reviews/reviews.module";
 import { Reviews } from "./modules/reviews/entity/reviews.entity";
 import { CommentsModule } from "./modules/comments/comments.module";
@@ -24,6 +22,7 @@ import { APP_FILTER, APP_GUARD } from "@nestjs/core";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { SearchsModule } from "./modules/searchs/searchs.module";
 import { FirebaseAuthGuard } from "./common/guards/firebase-auth.guard";
+// import { AwsS3Module } from "./modules/aws-s3/aws-s3.module";
 
 @Module({
   imports: [
@@ -42,7 +41,6 @@ import { FirebaseAuthGuard } from "./common/guards/firebase-auth.guard";
       entities: [
         Users,
         Follows,
-        ProfileImages,
         Reviews,
         Comments,
         LikesComments,
@@ -52,13 +50,13 @@ import { FirebaseAuthGuard } from "./common/guards/firebase-auth.guard";
     }),
     MusicsModule,
     FollowsModule,
-    ImagesModule,
     FirebaseModule,
     ReivewsModule,
     ChartsModule,
     CommentsModule,
     LikesModule,
     SearchsModule,
+    // AwsS3Module,
   ],
   controllers: [AppController],
   providers: [

@@ -8,8 +8,8 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { UsersService } from "./auth.service";
-import { CreateUserDTO } from "./dto/create-user.dto";
 import { FirebaseAuthGuard } from "@/common/guards/firebase-auth.guard";
+import { UserResponseDTO } from "./dto/create-user.dto";
 
 @Controller("auth")
 export class UsersController {
@@ -28,7 +28,7 @@ export class UsersController {
   async createUser(
     @Request() req,
     @Body()
-    createUserDTO: CreateUserDTO,
+    createUserDTO: UserResponseDTO,
   ) {
     const { uid } = req.user;
 
@@ -37,7 +37,7 @@ export class UsersController {
 
   @UseGuards(FirebaseAuthGuard)
   @Put("edit")
-  async editUser(@Request() req, @Body() userEdit: CreateUserDTO) {
+  async editUser(@Request() req, @Body() userEdit: UserResponseDTO) {
     const { uid } = req.user;
 
     return await this.usersService.editUser(uid, userEdit);

@@ -58,4 +58,4 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 
 
-/src/configs/firebase/firebase.spec.ts
+/src/modules/aws-s3

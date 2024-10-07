@@ -11,4 +11,10 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+
+  @Get("/healthcheck")
+  @SkipAuth()
+  healthCheck(): string {
+    return "OK";
+  }
 }

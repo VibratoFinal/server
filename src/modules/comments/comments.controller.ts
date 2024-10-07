@@ -57,8 +57,8 @@ export class CommentsController {
   ) {
     const { uid } = req.user;
     await this.commentsService.editComments(
-      reviewId,
       commentId,
+      reviewId,
       createCommentDTO,
       uid,
     );
