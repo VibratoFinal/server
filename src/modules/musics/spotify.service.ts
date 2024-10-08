@@ -3,24 +3,18 @@ import { ConfigService } from "@nestjs/config";
 import axios from "axios";
 import * as qs from "qs";
 import {
-  transformAlbums,
-  transformArtists,
-  transformTracks,
-  transformAll,
-} from "./utils/transform";
-import {
   AlbumDTO,
   ArtistDTO,
   SearchAllDTO,
   TrackDTO,
 } from "./dto/create-result.dto";
-// import { SongsDetailService } from "./songsdetail.service";
+import { MusicsRepository } from "./musics.repository";
 
 @Injectable()
 export class SpotifyService {
   constructor(
     private readonly configService: ConfigService,
-    // private readonly songsDetailService: SongsDetailService,
+    private readonly musicsRepository: MusicsRepository,
   ) {}
 
   public async getAccessToken(): Promise<string> {
@@ -63,7 +57,7 @@ export class SpotifyService {
         },
       });
 
-      return transformAll(response.data);
+      return await this.musicsRepository.transformAll(response.data);
     } catch (err) {
       console.error("Failed to Search Spotify All : ", err);
       throw new HttpException(
@@ -94,13 +88,9 @@ export class SpotifyService {
         },
       });
 
-      const tracks = transformTracks(response.data.tracks.items);
-      // const tracksInfoPromises = tracks.map(track =>
-      //   this.songsDetailService.getTracksInfo(track.id),
-      // );
-      // await Promise.all(tracksInfoPromises);
-
-      return tracks;
+      return await this.musicsRepository.transformTracks(
+        response.data.tracks.items,
+      );
     } catch (err) {
       console.error("Failed to Search Spotify Track : ", err);
       throw new HttpException(
@@ -131,7 +121,9 @@ export class SpotifyService {
         },
       });
 
-      return transformArtists(response.data.artists.items);
+      return await this.musicsRepository.transformArtists(
+        response.data.artists.items,
+      );
     } catch (err) {
       console.error("Failed to Search Spotify Artist : ", err);
       throw new HttpException(
@@ -162,7 +154,9 @@ export class SpotifyService {
         },
       });
 
-      return transformAlbums(response.data.albums.items);
+      return await this.musicsRepository.transformAlbums(
+        response.data.albums.items,
+      );
     } catch (err) {
       console.error("Failed to Search Spotify Album : ", err);
       throw new HttpException(

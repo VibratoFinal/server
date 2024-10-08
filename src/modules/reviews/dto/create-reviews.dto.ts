@@ -7,6 +7,6 @@ export class CreateReviewDTO {
   @IsString()
   contents: string;
 
-  @IsNumber()
-  type_id: number;
+  @IsString()
+  type_id: string;
 }

@@ -10,5 +10,6 @@ import { Comments } from "../comments/entity/comments.entity";
   imports: [TypeOrmModule.forFeature([Reviews, Comments]), FirebaseModule],
   controllers: [ReviewsController],
   providers: [ReviewsService],
+  exports: [ReviewsService],
 })
 export class ReivewsModule {}

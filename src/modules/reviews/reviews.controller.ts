@@ -40,7 +40,7 @@ export class ReviewsController {
   // type_id (앨범,트랙,아티스트) 리뷰 전체 조회
   @Get(":type_id")
   @SkipAuth()
-  async getAllReviews(@Param("type_id") typeId: number) {
+  async getAllReviews(@Param("type_id") typeId: string) {
     return await this.reviewsService.getAllReviews(typeId);
   }
 

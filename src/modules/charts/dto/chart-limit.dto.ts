@@ -1,6 +1,6 @@
-import { IsNumber } from "class-validator";
+import { IsString } from "class-validator";
 
 export class LimitDTO {
-  @IsNumber()
-  limit: number;
+  @IsString()
+  limit: string;
 }

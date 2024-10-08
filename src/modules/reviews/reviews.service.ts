@@ -26,7 +26,7 @@ export class ReviewsService {
   }
 
   // type_id (트랙,앨범,아티스트) 리뷰 전체 조회
-  async getAllReviews(typeId: number): Promise<Reviews[]> {
+  async getAllReviews(typeId: string): Promise<Reviews[]> {
     const allReviews = await this.reviewRepository.find({
       where: { type_id: typeId },
     });
@@ -102,5 +102,28 @@ export class ReviewsService {
         HttpStatus.FORBIDDEN,
       );
     }
+  }
+
+  // type_id를 통한 별점 정보 추출
+  public async getRateReview(typeId: string): Promise<[number, number]> {
+    const allReviews = await this.reviewRepository.find({
+      where: { type_id: typeId },
+    });
+    console.log(typeId, allReviews.length);
+    if (!typeId) {
+      return [0, 0];
+    }
+
+    if (!allReviews.length) {
+      return [0, 0];
+    }
+    let avgRate = 0;
+
+    for (const review of allReviews) {
+      avgRate += review.rated;
+    }
+    avgRate /= allReviews.length;
+
+    return [avgRate, allReviews.length];
   }
 }

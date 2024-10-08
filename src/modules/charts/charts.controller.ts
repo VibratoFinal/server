@@ -1,4 +1,4 @@
-import { Body, Controller, Get } from "@nestjs/common";
+import { Body, Controller, Get, Query } from "@nestjs/common";
 import { ChartsService } from "./charts.service";
 import { ChartsDTO } from "./dto/create-charts.dto";
 import { LimitDTO } from "./dto/chart-limit.dto";
@@ -37,9 +37,21 @@ export class ChartsController {
     return this.chartsService.getKoreaRecent(body);
   }
 
+  @Get("korea/recent_query")
+  @SkipAuth()
+  async koreaRecentByQuery(@Query() query: LimitDTO): Promise<ChartsDTO[]> {
+    return this.chartsService.getKoreaRecent(query);
+  }
+
   @Get("genres/animarnb")
   @SkipAuth()
   async animarnb(@Body() body: LimitDTO): Promise<ChartsDTO[]> {
     return this.chartsService.getAnimaRnB(body);
+  }
+
+  @Get("genres/animarnb_query")
+  @SkipAuth()
+  async animarnbByQuery(@Query() query: LimitDTO): Promise<ChartsDTO[]> {
+    return this.chartsService.getAnimaRnB(query);
   }
 }
