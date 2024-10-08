@@ -7,7 +7,7 @@ import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   app.enableCors({
-    origin: "http://localhost:5173", // 프론트엔드 서버의 주소
+    origin: "https://vibrato-five.vercel.app/", // 프론트엔드 서버의 주소
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   });
