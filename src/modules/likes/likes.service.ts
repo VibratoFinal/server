@@ -7,9 +7,11 @@ import { Users } from "@modules/auth/entity/auth.entity";
 import {
   CreateLikesCommentDTO,
   CreateLikesReviewDTO,
+  CreateLikesTypeDTO,
 } from "./dto/create-likes-dto";
 import { Reviews } from "../reviews/entity/reviews.entity";
 import { Comments } from "../comments/entity/comments.entity";
+import { LikesType } from "./entity/likesType.entity";
 
 // 리뷰 좋아요 추가, 삭제
 // 댓글 좋아요 추가, 삭제
@@ -21,6 +23,8 @@ export class LikesService {
     private likesReviewRepository: Repository<LikesReviews>,
     @InjectRepository(LikesComments)
     private likesCommentRepository: Repository<LikesComments>,
+    @InjectRepository(LikesType)
+    private likesTypeRepository: Repository<LikesType>,
     @InjectRepository(Users)
     private usersRepository: Repository<Users>,
 
@@ -120,6 +124,87 @@ export class LikesService {
 
     if (deleteLikeComment.affected === 0) {
       throw new HttpException("Like Comment Error", HttpStatus.NOT_FOUND);
+    }
+  }
+
+  // type_id 좋아요 추가
+  async addLikeType(uid: string, createLikesTypeDTO: CreateLikesTypeDTO) {
+    const type_id = createLikesTypeDTO.type_id;
+    const user = await this.findUserByUid(uid);
+    const bool = await this.checkLikeTypeid(uid, createLikesTypeDTO);
+    if (bool) {
+      throw new HttpException(
+        `${user} already liked ${type_id}.`,
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    try {
+      return await this.likesTypeRepository.insert({
+        user_uid: user,
+        type_id,
+      });
+    } catch (error) {
+      console.error(`Error happens while ${user} like ${type_id} :`, error);
+      throw new HttpException(
+        `Error happens while ${user} like ${type_id}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  // type_id 좋아요 제거
+  async removeLikeType(uid: string, createLikesTypeDTO: CreateLikesTypeDTO) {
+    const type_id = createLikesTypeDTO.type_id;
+    const user = await this.findUserByUid(uid);
+    try {
+      const bool = await this.checkLikeTypeid(uid, createLikesTypeDTO);
+      if (!bool) {
+        throw new HttpException(
+          `Already ${user} doesn't like ${type_id}`,
+          HttpStatus.CONFLICT,
+        );
+      }
+
+      return await this.likesTypeRepository.delete({
+        user_uid: user,
+        type_id,
+      });
+    } catch (error) {
+      console.error(`Error happens while ${user} dislike ${type_id} :`, error);
+      throw new HttpException(
+        `Error happens while ${user} dislike ${type_id}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  // user가 type_id 좋아하는지 체크
+  async checkLikeTypeid(uid: string, createLikesTypeDTO: CreateLikesTypeDTO) {
+    const user = await this.findUserByUid(uid);
+    const type_id = createLikesTypeDTO.type_id;
+    try {
+      const results = await this.likesTypeRepository.find({
+        where: {
+          type_id,
+        },
+      });
+      for (const result of results) {
+        if (result.user_uid.uid === user.uid) {
+          return true;
+        }
+      }
+
+      return false;
+    } catch (error) {
+      console.error(
+        `Error happens while finding whether ${user} like ${type_id} :`,
+        error,
+      );
+      throw new HttpException(
+        `Error happens while finding whether ${user} like ${type_id}.`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

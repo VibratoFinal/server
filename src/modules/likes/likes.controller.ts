@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Post,
   Request,
   UseGuards,
@@ -10,6 +11,7 @@ import { LikesService } from "./likes.service";
 import {
   CreateLikesCommentDTO,
   CreateLikesReviewDTO,
+  CreateLikesTypeDTO,
 } from "./dto/create-likes-dto";
 import { FirebaseAuthGuard } from "@/common/guards/firebase-auth.guard";
 
@@ -58,5 +60,38 @@ export class LikesController {
       uid,
       createLikesCommentDTO,
     );
+  }
+
+  @Post("/types")
+  @UseGuards(FirebaseAuthGuard)
+  async addLikeType(
+    @Request() req,
+    @Body() createLikesTypeDTO: CreateLikesTypeDTO,
+  ) {
+    const { uid } = req.user;
+    return await this.likesService.addLikeType(uid, createLikesTypeDTO);
+  }
+
+  @Delete("/types")
+  @UseGuards(FirebaseAuthGuard)
+  async removeLikeType(
+    @Request() req,
+    @Body() createLikesTypeDTO: CreateLikesTypeDTO,
+  ) {
+    const { uid } = req.user;
+    return await this.likesService.removeLikeType(uid, createLikesTypeDTO);
+  }
+
+  @Get("/types")
+  @UseGuards(FirebaseAuthGuard)
+  async getLikeType(
+    @Request() req,
+    @Body() createLikesTypeDTO: CreateLikesTypeDTO,
+  ) {
+    if (req.user === undefined) {
+      return false;
+    }
+    const { uid } = req.user;
+    return await this.likesService.checkLikeTypeid(uid, createLikesTypeDTO);
   }
 }

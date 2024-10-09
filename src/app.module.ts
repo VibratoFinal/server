@@ -22,6 +22,7 @@ import { APP_FILTER, APP_GUARD } from "@nestjs/core";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { SearchsModule } from "./modules/searchs/searchs.module";
 import { FirebaseAuthGuard } from "./common/guards/firebase-auth.guard";
+import { LikesType } from "./modules/likes/entity/likesType.entity";
 // import { AwsS3Module } from "./modules/aws-s3/aws-s3.module";
 
 @Module({
@@ -45,6 +46,7 @@ import { FirebaseAuthGuard } from "./common/guards/firebase-auth.guard";
         Comments,
         LikesComments,
         LikesReviews,
+        LikesType,
       ],
       synchronize: true,
     }),

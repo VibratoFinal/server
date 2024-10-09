@@ -1,4 +1,4 @@
-import { IsNumber } from "class-validator";
+import { IsNumber, IsString } from "class-validator";
 
 export class CreateLikesReviewDTO {
   @IsNumber()
@@ -8,4 +8,9 @@ export class CreateLikesReviewDTO {
 export class CreateLikesCommentDTO extends CreateLikesReviewDTO {
   @IsNumber()
   comment_id: number;
+}
+
+export class CreateLikesTypeDTO {
+  @IsString()
+  type_id: string;
 }
