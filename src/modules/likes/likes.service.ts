@@ -134,7 +134,7 @@ export class LikesService {
     const bool = await this.checkLikeTypeid(uid, createLikesTypeDTO);
     if (bool) {
       throw new HttpException(
-        `${user} already liked ${type_id}.`,
+        `${user.nickname} already liked ${type_id}.`,
         HttpStatus.CONFLICT,
       );
     }
@@ -147,7 +147,7 @@ export class LikesService {
     } catch (error) {
       console.error(`Error happens while ${user} like ${type_id} :`, error);
       throw new HttpException(
-        `Error happens while ${user} like ${type_id}`,
+        `Error happens while ${user.nickname} like ${type_id}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -161,7 +161,7 @@ export class LikesService {
       const bool = await this.checkLikeTypeid(uid, createLikesTypeDTO);
       if (!bool) {
         throw new HttpException(
-          `Already ${user} doesn't like ${type_id}`,
+          `Already ${user.nickname} doesn't like ${type_id}`,
           HttpStatus.CONFLICT,
         );
       }
@@ -173,7 +173,7 @@ export class LikesService {
     } catch (error) {
       console.error(`Error happens while ${user} dislike ${type_id} :`, error);
       throw new HttpException(
-        `Error happens while ${user} dislike ${type_id}`,
+        `Error happens while ${user.nickname} dislike ${type_id}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -198,11 +198,11 @@ export class LikesService {
       return false;
     } catch (error) {
       console.error(
-        `Error happens while finding whether ${user} like ${type_id} :`,
+        `Error happens while finding whether ${user.nickname} like ${type_id} :`,
         error,
       );
       throw new HttpException(
-        `Error happens while finding whether ${user} like ${type_id}.`,
+        `Error happens while finding whether ${user.nickname} like ${type_id}.`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

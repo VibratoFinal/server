@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Post,
   Request,
   UseGuards,
@@ -14,6 +15,7 @@ import {
   CreateLikesTypeDTO,
 } from "./dto/create-likes-dto";
 import { FirebaseAuthGuard } from "@/common/guards/firebase-auth.guard";
+import { SkipAuthOptional } from "@/common/decorators/skip-auth-optional.decorator";
 
 @Controller("likes")
 export class LikesController {
@@ -62,7 +64,8 @@ export class LikesController {
     );
   }
 
-  @Post("/types")
+  @Post("/type")
+  @HttpCode(201)
   @UseGuards(FirebaseAuthGuard)
   async addLikeType(
     @Request() req,
@@ -72,7 +75,8 @@ export class LikesController {
     return await this.likesService.addLikeType(uid, createLikesTypeDTO);
   }
 
-  @Delete("/types")
+  @Delete("/type")
+  @HttpCode(204)
   @UseGuards(FirebaseAuthGuard)
   async removeLikeType(
     @Request() req,
@@ -82,8 +86,9 @@ export class LikesController {
     return await this.likesService.removeLikeType(uid, createLikesTypeDTO);
   }
 
-  @Get("/types")
-  @UseGuards(FirebaseAuthGuard)
+  @Get("/type")
+  @HttpCode(202)
+  @SkipAuthOptional()
   async getLikeType(
     @Request() req,
     @Body() createLikesTypeDTO: CreateLikesTypeDTO,

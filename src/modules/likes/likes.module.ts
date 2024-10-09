@@ -24,5 +24,6 @@ import { LikesType } from "./entity/likesType.entity";
   ],
   providers: [LikesService],
   controllers: [LikesController],
+  exports: [LikesService],
 })
 export class LikesModule {}
