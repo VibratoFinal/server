@@ -7,6 +7,7 @@ import { Users } from "../auth/entity/auth.entity";
 import { FirebaseService } from "@/configs/firebase/firebase.service";
 import { Reviews } from "../reviews/entity/reviews.entity";
 import { Comments } from "../comments/entity/comments.entity";
+import { LikesType } from "./entity/likesType.entity";
 
 describe("LikesService", () => {
   let service: LikesService;
@@ -19,6 +20,7 @@ describe("LikesService", () => {
         { provide: FirebaseService, useValue: {} },
         { provide: getRepositoryToken(LikesReviews), useValue: {} },
         { provide: getRepositoryToken(LikesComments), useValue: {} },
+        { provide: getRepositoryToken(LikesType), useValue: {} },
         { provide: getRepositoryToken(Users), useValue: {} },
         { provide: getRepositoryToken(Reviews), useValue: {} },
         { provide: getRepositoryToken(Comments), useValue: {} },
