@@ -11,7 +11,7 @@ export class SearchsService {
     private readonly searchRepository: SearchsRepository,
   ) {}
 
-  public async getArtist(artist_id: string): Promise<ArtistDTO> {
+  public async getArtist(uid: string, artist_id: string): Promise<ArtistDTO> {
     try {
       const accessToken = await this.spotifyService.getAccessToken();
 
@@ -23,6 +23,7 @@ export class SearchsService {
       });
 
       return await this.searchRepository.transformArtist(
+        uid,
         response.data,
         artist_id,
       );
@@ -39,7 +40,7 @@ export class SearchsService {
     }
   }
 
-  public async getAlbum(album_id: string): Promise<AlbumDTO> {
+  public async getAlbum(uid: string, album_id: string): Promise<AlbumDTO> {
     try {
       const accessToken = await this.spotifyService.getAccessToken();
 
@@ -51,6 +52,7 @@ export class SearchsService {
       });
 
       return await this.searchRepository.transformAlbum(
+        uid,
         response.data,
         album_id,
       );
@@ -67,7 +69,7 @@ export class SearchsService {
     }
   }
 
-  public async getTrack(track_id: string): Promise<TrackDTO> {
+  public async getTrack(uid: string, track_id: string): Promise<TrackDTO> {
     try {
       const accessToken = await this.spotifyService.getAccessToken();
 
@@ -79,6 +81,7 @@ export class SearchsService {
       });
 
       return await this.searchRepository.transformTrack(
+        uid,
         response.data,
         track_id,
       );
