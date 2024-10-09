@@ -14,7 +14,7 @@ export class ChartsService {
     private readonly chartsRepository: ChartsRepository,
   ) {}
 
-  public async getGlobal50(): Promise<ChartsDTO[]> {
+  public async getGlobal50(uid: string): Promise<ChartsDTO[]> {
     try {
       const accessToken = await this.spotifyService.getAccessToken();
       const url =
@@ -26,6 +26,7 @@ export class ChartsService {
       });
 
       const charts = await this.chartsRepository.transformCharts(
+        uid,
         response.data.items,
       );
       return charts;
@@ -42,7 +43,7 @@ export class ChartsService {
     }
   }
 
-  public async getKorea50(): Promise<ChartsDTO[]> {
+  public async getKorea50(uid: string): Promise<ChartsDTO[]> {
     try {
       const accessToken = await this.spotifyService.getAccessToken();
       const url =
@@ -54,6 +55,7 @@ export class ChartsService {
       });
 
       const charts = await this.chartsRepository.transformCharts(
+        uid,
         response.data.items,
       );
       return charts;
@@ -70,7 +72,7 @@ export class ChartsService {
     }
   }
 
-  public async getGlobal50Weekly(): Promise<ChartsDTO[]> {
+  public async getGlobal50Weekly(uid: string): Promise<ChartsDTO[]> {
     try {
       const accessToken = await this.spotifyService.getAccessToken();
       const url =
@@ -82,6 +84,7 @@ export class ChartsService {
       });
 
       const charts = await this.chartsRepository.transformCharts(
+        uid,
         response.data.items,
       );
       return charts;
@@ -98,7 +101,7 @@ export class ChartsService {
     }
   }
 
-  public async getKorea50Weekly(): Promise<ChartsDTO[]> {
+  public async getKorea50Weekly(uid: string): Promise<ChartsDTO[]> {
     try {
       const accessToken = await this.spotifyService.getAccessToken();
       const url =
@@ -110,6 +113,7 @@ export class ChartsService {
       });
 
       const charts = await this.chartsRepository.transformCharts(
+        uid,
         response.data.items,
       );
       return charts;
@@ -126,7 +130,10 @@ export class ChartsService {
     }
   }
 
-  public async getKoreaRecent(body: LimitDTO): Promise<ChartsDTO[]> {
+  public async getKoreaRecent(
+    uid: string,
+    body: LimitDTO,
+  ): Promise<ChartsDTO[]> {
     try {
       const accessToken = await this.spotifyService.getAccessToken();
 
@@ -145,6 +152,7 @@ export class ChartsService {
       });
 
       const charts = await this.chartsRepository.transformCharts(
+        uid,
         response.data.items,
       );
       return charts;
@@ -161,7 +169,7 @@ export class ChartsService {
     }
   }
 
-  public async getAnimaRnB(body: LimitDTO): Promise<ChartsDTO[]> {
+  public async getAnimaRnB(uid: string, body: LimitDTO): Promise<ChartsDTO[]> {
     try {
       const accessToken = await this.spotifyService.getAccessToken();
       const url =
@@ -176,6 +184,7 @@ export class ChartsService {
       });
 
       const charts = await this.chartsRepository.transformCharts(
+        uid,
         response.data.items,
       );
       return charts;
