@@ -11,9 +11,9 @@ import { SpotifyService } from "./spotify.service";
 export class MusicsService {
   constructor(private readonly spotifyService: SpotifyService) {}
 
-  public async searchAll(body: string): Promise<SearchAllDTO> {
+  public async searchAll(uid: string, body: string): Promise<SearchAllDTO> {
     try {
-      return this.spotifyService.searchAll(body);
+      return this.spotifyService.searchAll(uid, body);
     } catch (err) {
       console.error("Failed to Search All : ", err);
       throw new HttpException(
@@ -27,9 +27,9 @@ export class MusicsService {
     }
   }
 
-  public async searchTrack(body: string): Promise<TrackDTO[]> {
+  public async searchTrack(uid: string, body: string): Promise<TrackDTO[]> {
     try {
-      return this.spotifyService.searchTrack(body);
+      return this.spotifyService.searchTrack(uid, body);
     } catch (err) {
       console.error("Failed to Search Track : ", err);
       throw new HttpException(
@@ -43,9 +43,9 @@ export class MusicsService {
     }
   }
 
-  public async searchArtist(body: string): Promise<ArtistDTO[]> {
+  public async searchArtist(uid: string, body: string): Promise<ArtistDTO[]> {
     try {
-      return this.spotifyService.searchArtist(body);
+      return this.spotifyService.searchArtist(uid, body);
     } catch (err) {
       console.error("Failed to Search Artist : ", err);
       throw new HttpException(
@@ -59,9 +59,9 @@ export class MusicsService {
     }
   }
 
-  public async searchAlbum(body: string): Promise<AlbumDTO[]> {
+  public async searchAlbum(uid: string, body: string): Promise<AlbumDTO[]> {
     try {
-      return this.spotifyService.searchAlbum(body);
+      return this.spotifyService.searchAlbum(uid, body);
     } catch (err) {
       console.error("Failed to Search Album : ", err);
       throw new HttpException(

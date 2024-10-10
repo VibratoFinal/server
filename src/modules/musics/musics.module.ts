@@ -4,9 +4,10 @@ import { MusicsController } from "./musics.controller";
 import { MusicsService } from "./musics.service";
 import { ReivewsModule } from "../reviews/reviews.module";
 import { MusicsRepository } from "./musics.repository";
+import { LikesModule } from "../likes/likes.module";
 
 @Module({
-  imports: [ReivewsModule],
+  imports: [ReivewsModule, LikesModule],
   providers: [SpotifyService, MusicsService, MusicsRepository],
   controllers: [MusicsController],
   exports: [MusicsRepository],

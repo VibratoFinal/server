@@ -6,16 +6,26 @@ import {
   forOthersDTO,
   TrackDTO,
 } from "./dto/create-search.dto";
+import { LikesService } from "../likes/likes.service";
 
 @Injectable()
 export class SearchsRepository {
-  constructor(private readonly reviewsService: ReviewsService) {}
+  constructor(
+    private readonly reviewsService: ReviewsService,
+    private readonly likesService: LikesService,
+  ) {}
 
   public async transformArtist(
+    uid: string,
     res: any,
     artist_id: string,
   ): Promise<ArtistDTO> {
     const [avg, count] = await this.reviewsService.getRateReview(artist_id);
+    const liked = uid
+      ? await this.likesService.checkLikeTypeid(uid, {
+          type_id: artist_id,
+        })
+      : false;
     return {
       name: res.name,
       image_url: res.images[0].url,
@@ -23,12 +33,21 @@ export class SearchsRepository {
       spotify_url: res.external_urls.spotify,
       avg_rated: avg,
       count_rated: count,
-      liked: false,
+      liked,
     };
   }
 
-  public async transformAlbum(res: any, album_id: string): Promise<AlbumDTO> {
+  public async transformAlbum(
+    uid: string,
+    res: any,
+    album_id: string,
+  ): Promise<AlbumDTO> {
     const [avg, count] = await this.reviewsService.getRateReview(album_id);
+    const liked = uid
+      ? await this.likesService.checkLikeTypeid(uid, {
+          type_id: album_id,
+        })
+      : false;
     return {
       name: res.name,
       image_url: res.images[0].url,
@@ -39,14 +58,23 @@ export class SearchsRepository {
       spotify_url: res.external_urls.spotify,
       avg_rated: avg,
       count_rated: count,
-      liked: false,
-      tracks: await this.transformTrackForOthers(res.tracks.items),
-      artists: await this.transformArtistForOthers(res.artists),
+      liked,
+      tracks: await this.transformTrackForOthers(uid, res.tracks.items),
+      artists: await this.transformArtistForOthers(uid, res.artists),
     };
   }
 
-  public async transformTrack(res: any, track_id: string): Promise<TrackDTO> {
+  public async transformTrack(
+    uid: string,
+    res: any,
+    track_id: string,
+  ): Promise<TrackDTO> {
     const [avg, count] = await this.reviewsService.getRateReview(track_id);
+    const liked = uid
+      ? await this.likesService.checkLikeTypeid(uid, {
+          type_id: track_id,
+        })
+      : false;
     return {
       name: res.name,
       image_url: res.album.images[0].url,
@@ -58,47 +86,73 @@ export class SearchsRepository {
       duration: res.duration_ms,
       avg_rated: avg,
       count_rated: count,
-      liked: false,
-      album: await this.transformAlbumForOthers(res.album),
-      artists: await this.transformArtistForOthers(res.artists),
+      liked,
+      album: await this.transformAlbumForOthers(uid, res.album),
+      artists: await this.transformArtistForOthers(uid, res.artists),
     };
   }
 
   private async transformArtistForOthers(
+    uid: string,
     items: any[],
   ): Promise<forOthersDTO[]> {
     return Promise.all(
-      items.map(async item => ({
-        id: item.id,
-        name: item.name,
-        spotify_url: item.external_urls.spotify,
-        avg_rate: await this.reviewsService.getRateReview(item.id)[0],
-        liked: false,
-      })),
+      items.map(async item => {
+        const liked = uid
+          ? await this.likesService.checkLikeTypeid(uid, {
+              type_id: item.id,
+            })
+          : false;
+        return {
+          id: item.id,
+          name: item.name,
+          spotify_url: item.external_urls.spotify,
+          avg_rate: await this.reviewsService.getRateReview(item.id)[0],
+          liked,
+        };
+      }),
     );
   }
 
-  private async transformTrackForOthers(items: any[]): Promise<forOthersDTO[]> {
+  private async transformTrackForOthers(
+    uid: string,
+    items: any[],
+  ): Promise<forOthersDTO[]> {
     return Promise.all(
-      items.map(async item => ({
-        id: item.id,
-        name: item.name,
-        spotify_url: item.external_urls.spotify,
-        track_number: item.track_number,
-        avg_rate: await this.reviewsService.getRateReview(item.id)[0],
-        liked: false,
-      })),
+      items.map(async item => {
+        const liked = uid
+          ? await this.likesService.checkLikeTypeid(uid, {
+              type_id: item.id,
+            })
+          : false;
+        return {
+          id: item.id,
+          name: item.name,
+          spotify_url: item.external_urls.spotify,
+          track_number: item.track_number,
+          avg_rate: await this.reviewsService.getRateReview(item.id)[0],
+          liked,
+        };
+      }),
     );
   }
 
-  private async transformAlbumForOthers(res: any): Promise<forOthersDTO> {
+  private async transformAlbumForOthers(
+    uid: string,
+    res: any,
+  ): Promise<forOthersDTO> {
     const avg = await this.reviewsService.getRateReview(res.id);
+    const liked = uid
+      ? await this.likesService.checkLikeTypeid(uid, {
+          type_id: res.id,
+        })
+      : false;
     return {
       id: res.id,
       name: res.name,
       spotify_url: res.external_urls.spotify,
       avg_rate: avg[0],
-      liked: false,
+      liked,
     };
   }
 }

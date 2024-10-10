@@ -8,12 +8,14 @@ import { Users } from "@/modules/auth/entity/auth.entity";
 import { FirebaseModule } from "@/configs/firebase/firebase.module";
 import { Reviews } from "../reviews/entity/reviews.entity";
 import { Comments } from "../comments/entity/comments.entity";
+import { LikesType } from "./entity/likesType.entity";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       LikesComments,
       LikesReviews,
+      LikesType,
       Users,
       Reviews,
       Comments,
@@ -22,5 +24,6 @@ import { Comments } from "../comments/entity/comments.entity";
   ],
   providers: [LikesService],
   controllers: [LikesController],
+  exports: [LikesService],
 })
 export class LikesModule {}

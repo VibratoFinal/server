@@ -109,7 +109,6 @@ export class ReviewsService {
     const allReviews = await this.reviewRepository.find({
       where: { type_id: typeId },
     });
-    console.log(typeId, allReviews.length);
     if (!typeId) {
       return [0, 0];
     }
