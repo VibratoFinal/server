@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
+  HttpCode,
   Post,
   Request,
   UseGuards,
@@ -10,8 +12,10 @@ import { LikesService } from "./likes.service";
 import {
   CreateLikesCommentDTO,
   CreateLikesReviewDTO,
+  CreateLikesTypeDTO,
 } from "./dto/create-likes-dto";
 import { FirebaseAuthGuard } from "@/common/guards/firebase-auth.guard";
+import { SkipAuthOptional } from "@/common/decorators/skip-auth-optional.decorator";
 
 @Controller("likes")
 export class LikesController {
@@ -58,5 +62,41 @@ export class LikesController {
       uid,
       createLikesCommentDTO,
     );
+  }
+
+  @Post("/type")
+  @HttpCode(201)
+  @UseGuards(FirebaseAuthGuard)
+  async addLikeType(
+    @Request() req,
+    @Body() createLikesTypeDTO: CreateLikesTypeDTO,
+  ) {
+    const { uid } = req.user;
+    return await this.likesService.addLikeType(uid, createLikesTypeDTO);
+  }
+
+  @Delete("/type")
+  @HttpCode(204)
+  @UseGuards(FirebaseAuthGuard)
+  async removeLikeType(
+    @Request() req,
+    @Body() createLikesTypeDTO: CreateLikesTypeDTO,
+  ) {
+    const { uid } = req.user;
+    return await this.likesService.removeLikeType(uid, createLikesTypeDTO);
+  }
+
+  @Get("/type")
+  @HttpCode(202)
+  @SkipAuthOptional()
+  async getLikeType(
+    @Request() req,
+    @Body() createLikesTypeDTO: CreateLikesTypeDTO,
+  ) {
+    if (req.user === undefined) {
+      return false;
+    }
+    const { uid } = req.user;
+    return await this.likesService.checkLikeTypeid(uid, createLikesTypeDTO);
   }
 }

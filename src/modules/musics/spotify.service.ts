@@ -40,7 +40,7 @@ export class SpotifyService {
     }
   }
 
-  public async searchAll(body: string): Promise<SearchAllDTO> {
+  public async searchAll(uid: string, body: string): Promise<SearchAllDTO> {
     try {
       const accessToken = await this.getAccessToken();
       const url = "https://api.spotify.com/v1/search";
@@ -57,7 +57,7 @@ export class SpotifyService {
         },
       });
 
-      return await this.musicsRepository.transformAll(response.data);
+      return await this.musicsRepository.transformAll(uid, response.data);
     } catch (err) {
       console.error("Failed to Search Spotify All : ", err);
       throw new HttpException(
@@ -71,7 +71,7 @@ export class SpotifyService {
     }
   }
 
-  public async searchTrack(body: string): Promise<TrackDTO[]> {
+  public async searchTrack(uid: string, body: string): Promise<TrackDTO[]> {
     try {
       const accessToken = await this.getAccessToken();
       const url = "https://api.spotify.com/v1/search";
@@ -89,6 +89,7 @@ export class SpotifyService {
       });
 
       return await this.musicsRepository.transformTracks(
+        uid,
         response.data.tracks.items,
       );
     } catch (err) {
@@ -104,7 +105,7 @@ export class SpotifyService {
     }
   }
 
-  public async searchArtist(body: string): Promise<ArtistDTO[]> {
+  public async searchArtist(uid: string, body: string): Promise<ArtistDTO[]> {
     try {
       const accessToken = await this.getAccessToken();
       const url = "https://api.spotify.com/v1/search";
@@ -122,6 +123,7 @@ export class SpotifyService {
       });
 
       return await this.musicsRepository.transformArtists(
+        uid,
         response.data.artists.items,
       );
     } catch (err) {
@@ -137,7 +139,7 @@ export class SpotifyService {
     }
   }
 
-  public async searchAlbum(body: string): Promise<AlbumDTO[]> {
+  public async searchAlbum(uid: string, body: string): Promise<AlbumDTO[]> {
     try {
       const accessToken = await this.getAccessToken();
       const url = "https://api.spotify.com/v1/search";
@@ -155,6 +157,7 @@ export class SpotifyService {
       });
 
       return await this.musicsRepository.transformAlbums(
+        uid,
         response.data.albums.items,
       );
     } catch (err) {

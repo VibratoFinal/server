@@ -15,8 +15,8 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false,  
-    
+    "noFallthroughCasesInSwitch": false   
   },
+  "include": [ "src/**/*.ts"],
   "extends": "./tsconfig.paths.json"
 }

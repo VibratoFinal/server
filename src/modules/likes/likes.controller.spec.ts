@@ -9,6 +9,7 @@ import { Users } from "../auth/entity/auth.entity";
 import { FirebaseService } from "@/configs/firebase/firebase.service";
 import { Comments } from "../comments/entity/comments.entity";
 import { Reviews } from "../reviews/entity/reviews.entity";
+import { LikesType } from "./entity/likesType.entity";
 
 describe("LikesController", () => {
   let controller: LikesController;
@@ -23,6 +24,7 @@ describe("LikesController", () => {
         { provide: FirebaseService, useValue: {} },
         { provide: getRepositoryToken(LikesReviews), useValue: {} },
         { provide: getRepositoryToken(LikesComments), useValue: {} },
+        { provide: getRepositoryToken(LikesType), useValue: {} },
         { provide: getRepositoryToken(Users), useValue: {} },
         { provide: getRepositoryToken(Comments), useValue: {} },
         { provide: getRepositoryToken(Reviews), useValue: {} },

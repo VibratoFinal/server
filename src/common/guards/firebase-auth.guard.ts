@@ -9,6 +9,7 @@ import { FirebaseService } from "@/configs/firebase/firebase.service";
 import { Reflector } from "@nestjs/core";
 import { SKIP_AUTH_KEY } from "../decorators/skip-auth.decorator";
 import { Request } from "express";
+import { SKIP_AUTH_OPTIONAL_KEY } from "../decorators/skip-auth-optional.decorator";
 
 interface CustomRequest extends Request {
   user?: any;
@@ -32,6 +33,16 @@ export class FirebaseAuthGuard implements CanActivate {
     );
     if (skipAuth) {
       return true;
+    }
+
+    const skipAuthOptional = this.reflector.get<boolean>(
+      SKIP_AUTH_OPTIONAL_KEY,
+      context.getHandler(),
+    );
+    if (skipAuthOptional) {
+      if (!authHeader) {
+        return true;
+      }
     }
 
     const idToken = this.extractToken(authHeader);
