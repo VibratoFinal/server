@@ -104,7 +104,10 @@ export class LikesService {
     });
 
     if (deleteLikeReview.affected === 0) {
-      throw new HttpException("Like Review Error", HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        "DELETE Like Review Not Found",
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
   // 테스트 해봐야함

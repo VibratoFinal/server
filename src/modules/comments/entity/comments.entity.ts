@@ -1,3 +1,4 @@
+import { LikesComments } from "@/modules/likes/entity/likesComment.entity";
 import { Reviews } from "@modules/reviews/entity/reviews.entity";
 import {
   Column,
@@ -5,6 +6,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
@@ -29,4 +31,9 @@ export class Comments {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @OneToMany(() => LikesComments, likeComment => likeComment.comment_id, {
+    eager: true,
+  })
+  likes: LikesComments[];
 }

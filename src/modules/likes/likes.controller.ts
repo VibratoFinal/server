@@ -41,7 +41,7 @@ export class LikesController {
     return await this.likesService.addLikeComment(uid, createLikesCommentDTO);
   }
 
-  @Delete("/reviews")
+  @Delete("/review")
   @UseGuards(FirebaseAuthGuard)
   async removeLikeReview(
     @Request() req,
@@ -51,7 +51,7 @@ export class LikesController {
     return await this.likesService.removeLikeReview(uid, createLikesReviewDTO);
   }
 
-  @Delete("/reviews/comment")
+  @Delete("/review/comment")
   @UseGuards(FirebaseAuthGuard)
   async removeLikeComment(
     @Request() req,

@@ -19,7 +19,6 @@ export class LikesReviews {
   user_uid: Users;
 
   @ManyToOne(() => Reviews, review => review.review_id, {
-    eager: true,
     onDelete: "CASCADE",
   })
   @JoinColumn({ name: "review_id" })

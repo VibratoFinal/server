@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Post,
   Put,
@@ -19,6 +20,7 @@ export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Post(":review_id/comments")
+  @HttpCode(201)
   @UseGuards(FirebaseAuthGuard)
   async addComment(
     @Request() req,
@@ -33,6 +35,7 @@ export class CommentsController {
   // 해당 리뷰 전체 댓글 조회
 
   @Get(":reviewId/comments")
+  @HttpCode(200)
   @SkipAuth()
   async getAllComments(@Param("reviewId") reviewId: number) {
     return await this.commentsService.getAllComments(reviewId);
@@ -40,6 +43,7 @@ export class CommentsController {
 
   // 내가 쓴 댓글 조회
   @Get("comments")
+  @HttpCode(200)
   @UseGuards(FirebaseAuthGuard)
   async getUserComments(@Request() req) {
     const { uid } = req.user;
@@ -47,6 +51,7 @@ export class CommentsController {
   }
 
   @Put(":reviewId/comments/:commentId")
+  @HttpCode(200)
   @UseGuards(FirebaseAuthGuard)
   async editComments(
     @Param("reviewId") reviewId: number,
@@ -57,8 +62,8 @@ export class CommentsController {
   ) {
     const { uid } = req.user;
     await this.commentsService.editComments(
-      commentId,
       reviewId,
+      commentId,
       createCommentDTO,
       uid,
     );
@@ -66,6 +71,7 @@ export class CommentsController {
   }
 
   @Delete(":reviewId/comments/:commentId")
+  @HttpCode(200)
   @UseGuards(FirebaseAuthGuard)
   async deleteComment(
     @Param("reviewId") reviewId: number,

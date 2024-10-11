@@ -5,6 +5,7 @@ import {
   Body,
   UseGuards,
   Request,
+  HttpCode,
 } from "@nestjs/common";
 import { FollowsService } from "./follows.service";
 import { CreateFollowDTO } from "./dto/create-follows.dto";
@@ -15,6 +16,7 @@ export class FollowsController {
   constructor(private readonly followsService: FollowsService) {}
 
   @Post()
+  @HttpCode(201)
   @UseGuards(FirebaseAuthGuard)
   async follow(
     @Request() req,
@@ -26,6 +28,7 @@ export class FollowsController {
   }
 
   @Delete()
+  @HttpCode(200)
   @UseGuards(FirebaseAuthGuard)
   async unFollow(
     @Request() req,
