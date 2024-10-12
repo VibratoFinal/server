@@ -28,7 +28,7 @@ import { LikesType } from "./modules/likes/entity/likesType.entity";
   imports: [
     UsersModule,
     ConfigModule.forRoot({
-      envFilePath: [".development.env", ".production.env"],
+      envFilePath: [".development.env"],
       isGlobal: true,
     }),
     TypeOrmModule.forRoot({
