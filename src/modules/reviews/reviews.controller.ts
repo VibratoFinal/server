@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Post,
   Put,
@@ -26,6 +27,7 @@ export class ReviewsController {
 
   // 리뷰 작성
   @Post()
+  @HttpCode(201)
   @UseGuards(FirebaseAuthGuard)
   async addReview(
     @Request() req,
@@ -39,6 +41,7 @@ export class ReviewsController {
 
   // type_id (앨범,트랙,아티스트) 리뷰 전체 조회
   @Get(":type_id")
+  @HttpCode(200)
   @SkipAuth()
   async getAllReviews(@Param("type_id") typeId: string) {
     return await this.reviewsService.getAllReviews(typeId);
@@ -46,6 +49,7 @@ export class ReviewsController {
 
   // 내가 쓴 리뷰 조회
   @Get()
+  @HttpCode(200)
   @UseGuards(FirebaseAuthGuard)
   async getUserReviews(@Request() req) {
     const { uid } = req.user;
@@ -54,6 +58,7 @@ export class ReviewsController {
 
   // 리뷰 수정
   @Put(":review_id")
+  @HttpCode(200)
   @UseGuards(FirebaseAuthGuard)
   async editReview(
     @Param("review_id") review_id: number,
@@ -68,6 +73,7 @@ export class ReviewsController {
 
   // 리뷰 삭제
   @Delete(":review_id")
+  @HttpCode(200)
   @UseGuards(FirebaseAuthGuard)
   async deleteReview(@Param("review_id") review_id: number, @Request() req) {
     const { uid } = req.user;

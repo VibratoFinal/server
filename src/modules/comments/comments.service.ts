@@ -4,6 +4,7 @@ import { Comments } from "./entity/comments.entity";
 import { Repository } from "typeorm";
 import { CreateCommentDTO } from "./dto/create-comments.dto";
 import { Reviews } from "@modules/reviews/entity/reviews.entity";
+import { Users } from "../auth/entity/auth.entity";
 
 // 코멘트 작성 add
 // 수정 edit
@@ -19,7 +20,16 @@ export class CommentsService {
 
     @InjectRepository(Reviews)
     private reviewRepository: Repository<Reviews>,
+    @InjectRepository(Users)
+    private usersRepository: Repository<Users>,
   ) {}
+  private async findUserByUid(uid: string): Promise<Users> {
+    const user = await this.usersRepository.findOne({ where: { uid } });
+    if (!user) {
+      throw new HttpException("User not found", HttpStatus.NOT_FOUND);
+    }
+    return user;
+  }
 
   // 댓글 작성
   async addComment(
@@ -28,7 +38,7 @@ export class CommentsService {
     createCommentDTO: CreateCommentDTO,
   ) {
     const { contents } = createCommentDTO;
-
+    const user = await this.findUserByUid(uid);
     const review = await this.reviewRepository.findOne({
       where: { review_id: reviewId },
     });
@@ -38,7 +48,7 @@ export class CommentsService {
     }
 
     return await this.commentRepository.insert({
-      user_uid: uid,
+      user_uid: user.uid,
       contents,
       review,
     });
@@ -59,7 +69,13 @@ export class CommentsService {
 
   // 내가 쓴 댓글 조회
   async getUserComments(uid: string): Promise<Comments[]> {
-    return await this.commentRepository.find({ where: { user_uid: uid } });
+    const getUid = await this.commentRepository.find({
+      where: { user_uid: uid },
+    });
+    if (!getUid.length) {
+      throw new HttpException("User Comment not found", HttpStatus.NOT_FOUND);
+    }
+    return getUid;
   }
 
   // 댓글 수정
@@ -99,6 +115,7 @@ export class CommentsService {
         comment_id: commentId,
       },
     });
+
     if (!findComment) {
       throw new HttpException("Comment not found", HttpStatus.NOT_FOUND);
     }

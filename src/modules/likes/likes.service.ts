@@ -9,9 +9,9 @@ import {
   CreateLikesReviewDTO,
   CreateLikesTypeDTO,
 } from "./dto/create-likes-dto";
+import { LikesType } from "./entity/likesType.entity";
 import { Reviews } from "../reviews/entity/reviews.entity";
 import { Comments } from "../comments/entity/comments.entity";
-import { LikesType } from "./entity/likesType.entity";
 
 // 리뷰 좋아요 추가, 삭제
 // 댓글 좋아요 추가, 삭제
@@ -27,10 +27,8 @@ export class LikesService {
     private likesTypeRepository: Repository<LikesType>,
     @InjectRepository(Users)
     private usersRepository: Repository<Users>,
-
     @InjectRepository(Reviews)
     private reviewRepository: Repository<Reviews>,
-
     @InjectRepository(Comments)
     private commentRepository: Repository<Comments>,
   ) {}
@@ -46,17 +44,18 @@ export class LikesService {
   async addLikeReview(uid: string, createLikesReviewDTO: CreateLikesReviewDTO) {
     const { review_id } = createLikesReviewDTO;
 
-    const findReviewId = await this.reviewRepository.find({
+    const findReview = await this.reviewRepository.findOne({
       where: { review_id },
     });
-    if (!findReviewId.length) {
+
+    if (!findReview) {
       throw new HttpException("review not found", HttpStatus.NOT_FOUND);
     }
     const user = await this.findUserByUid(uid);
     try {
       return await this.likesReviewRepository.insert({
         user_uid: user,
-        review_id,
+        review_id: findReview,
       });
     } catch (error) {
       if (error.code === "ER_DUP_ENTRY") {
@@ -70,10 +69,13 @@ export class LikesService {
     createLikesCommentDTO: CreateLikesCommentDTO,
   ) {
     const { review_id, comment_id } = createLikesCommentDTO;
-    const findCommentId = await this.commentRepository.find({
+    const findReview = await this.reviewRepository.findOne({
+      where: { review_id },
+    });
+    const findComment = await this.commentRepository.findOne({
       where: { comment_id },
     });
-    if (!findCommentId.length) {
+    if (!findReview || !findComment) {
       throw new HttpException("Comment not found", HttpStatus.NOT_FOUND);
     }
 
@@ -81,8 +83,8 @@ export class LikesService {
     try {
       return await this.likesCommentRepository.insert({
         user_uid: user,
-        review_id,
-        comment_id,
+        review_id: findReview,
+        comment: findComment,
       });
     } catch (error) {
       if (error.code === "ER_DUP_ENTRY") {
@@ -97,17 +99,22 @@ export class LikesService {
   ) {
     const user = await this.findUserByUid(uid);
     const { review_id } = createLikesReviewDTO;
+    const findReview = await this.reviewRepository.findOne({
+      where: { review_id },
+    });
 
     const deleteLikeReview = await this.likesReviewRepository.delete({
       user_uid: user,
-      review_id,
+      review_id: findReview,
     });
 
     if (deleteLikeReview.affected === 0) {
-      throw new HttpException("Like Review Error", HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        "DELETE Like Review Not Found",
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
-  // 테스트 해봐야함
 
   async removeLikeComment(
     uid: string,
@@ -115,11 +122,17 @@ export class LikesService {
   ) {
     const user = await this.findUserByUid(uid);
     const { review_id, comment_id } = createLikesCommentDTO;
+    const findReview = await this.reviewRepository.findOne({
+      where: { review_id },
+    });
+    const findComment = await this.commentRepository.findOne({
+      where: { comment_id },
+    });
 
     const deleteLikeComment = await this.likesCommentRepository.delete({
       user_uid: user,
-      review_id,
-      comment_id,
+      review_id: findReview,
+      comment: findComment,
     });
 
     if (deleteLikeComment.affected === 0) {

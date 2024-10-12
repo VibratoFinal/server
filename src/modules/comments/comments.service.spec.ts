@@ -5,6 +5,7 @@ import { Comments } from "./entity/comments.entity";
 import { Reviews } from "../reviews/entity/reviews.entity";
 import { ReviewsService } from "../reviews/reviews.service";
 import { FirebaseService } from "@/configs/firebase/firebase.service";
+import { Users } from "../auth/entity/auth.entity";
 
 describe("CommentsService", () => {
   let service: CommentsService;
@@ -17,6 +18,7 @@ describe("CommentsService", () => {
         ReviewsService,
         { provide: FirebaseService, useValue: {} },
         { provide: getRepositoryToken(Comments), useValue: {} },
+        { provide: getRepositoryToken(Users), useValue: {} },
         { provide: getRepositoryToken(Reviews), useValue: {} },
       ],
     }).compile();

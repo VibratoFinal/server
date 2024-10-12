@@ -1,7 +1,7 @@
-import { IsNumber } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 
 export class CreateFollowDTO {
-  // 프론트 연결 후 user_uid 필요
-  @IsNumber()
+  @IsNotEmpty()
+  @IsString()
   type_id: string;
 }
