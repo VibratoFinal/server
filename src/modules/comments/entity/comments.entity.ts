@@ -32,7 +32,7 @@ export class Comments {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @OneToMany(() => LikesComments, likeComment => likeComment.comment_id, {
+  @OneToMany(() => LikesComments, likeComment => likeComment.comment, {
     eager: true,
   })
   likes: LikesComments[];

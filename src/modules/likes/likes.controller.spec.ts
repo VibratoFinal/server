@@ -5,7 +5,6 @@ import { getRepositoryToken } from "@nestjs/typeorm";
 import { LikesReviews } from "./entity/likesReview.entity";
 import { LikesComments } from "./entity/likesComment.entity";
 import { Users } from "../auth/entity/auth.entity";
-// import { InsertResult } from "typeorm";
 import { FirebaseService } from "@/configs/firebase/firebase.service";
 import { Comments } from "../comments/entity/comments.entity";
 import { Reviews } from "../reviews/entity/reviews.entity";
@@ -18,6 +17,7 @@ describe("LikesController", () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [],
       controllers: [LikesController],
       providers: [
         LikesService,

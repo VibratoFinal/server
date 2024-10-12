@@ -5,6 +5,7 @@ import { getRepositoryToken } from "@nestjs/typeorm";
 import { Reviews } from "./entity/reviews.entity";
 import { Comments } from "../comments/entity/comments.entity";
 import { FirebaseService } from "@/configs/firebase/firebase.service";
+import { Users } from "../auth/entity/auth.entity";
 
 describe("ReviewsController", () => {
   let controller: ReviewsController;
@@ -18,6 +19,7 @@ describe("ReviewsController", () => {
         { provide: FirebaseService, useValue: {} },
         { provide: getRepositoryToken(Reviews), useValue: {} },
         { provide: getRepositoryToken(Comments), useValue: {} },
+        { provide: getRepositoryToken(Users), useValue: {} },
       ],
     }).compile();
 

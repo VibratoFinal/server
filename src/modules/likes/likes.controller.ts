@@ -22,6 +22,7 @@ export class LikesController {
   constructor(private readonly likesService: LikesService) {}
 
   @Post("/review")
+  @HttpCode(201)
   @UseGuards(FirebaseAuthGuard)
   async addLikeReview(
     @Request() req,

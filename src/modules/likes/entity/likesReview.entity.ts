@@ -22,5 +22,5 @@ export class LikesReviews {
     onDelete: "CASCADE",
   })
   @JoinColumn({ name: "review_id" })
-  review_id: number;
+  review_id: Reviews;
 }
