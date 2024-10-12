@@ -3,11 +3,15 @@ import { AppModule } from "./app.module";
 import { ValidationPipe } from "@nestjs/common";
 import { LoggingInterceptor } from "./common/interceptors/logging.interceptors";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
+import { ConfigService } from "@nestjs/config";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
+  const configService = app.get<ConfigService>(ConfigService);
+  const frontendUrl = configService.get<string>("FRONTEND_URL");
+
   app.enableCors({
-    origin: "http://localhost:5173", // 프론트엔드 서버의 주소
+    origin: frontendUrl, // 프론트엔드 서버의 주소
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   });

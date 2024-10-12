@@ -35,10 +35,8 @@
     "class-validator": "^0.14.1",
     "dotenv": "^16.4.5",
     "firebase-admin": "^12.4.0",
-    "http-status-codes": "^2.3.0",
     "module-alias": "^2.2.3",
     "mysql2": "^3.11.0",
-    "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.20"
@@ -53,6 +51,7 @@
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
+    "cross-env": "^7.0.3",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
