@@ -89,10 +89,10 @@ export class TrackDTO {
   spotify_url: string;
 
   @IsNumber()
-  track_number: string;
+  track_number: number;
 
   @IsNumber()
-  duration: string;
+  duration: number;
 
   @IsNumber()
   avg_rated: number;
