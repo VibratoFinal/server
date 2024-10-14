@@ -19,6 +19,6 @@ export class Users {
   @Column({ type: "varchar", comment: "유저 닉네임" })
   nickname: string;
 
-  @CreateDateColumn({ name: "create_at", comment: "생성일" })
+  @CreateDateColumn({ name: "created_at", comment: "생성일" })
   created_at: Date;
 }

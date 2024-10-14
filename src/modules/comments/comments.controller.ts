@@ -61,13 +61,12 @@ export class CommentsController {
     createCommentDTO: CreateCommentDTO,
   ) {
     const { uid } = req.user;
-    await this.commentsService.editComments(
+    return await this.commentsService.editComments(
       reviewId,
       commentId,
-      createCommentDTO,
       uid,
+      createCommentDTO,
     );
-    return { message: "Comment 수정 완료" };
   }
 
   @Delete(":reviewId/comments/:commentId")
@@ -80,6 +79,6 @@ export class CommentsController {
   ) {
     const { uid } = req.user;
 
-    await this.commentsService.deleteComment(reviewId, commentId, uid);
+    return await this.commentsService.deleteComment(reviewId, commentId, uid);
   }
 }

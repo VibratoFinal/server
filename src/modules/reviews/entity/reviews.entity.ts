@@ -21,6 +21,9 @@ export class Reviews {
   rated: number;
 
   @Column()
+  title: string;
+
+  @Column()
   contents: string;
 
   @Column()

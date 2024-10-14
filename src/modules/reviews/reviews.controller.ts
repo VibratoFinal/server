@@ -67,8 +67,11 @@ export class ReviewsController {
     createReviewDTO: CreateReviewDTO,
   ) {
     const { uid } = req.user;
-    await this.reviewsService.editReview(review_id, createReviewDTO, uid);
-    return { message: "Review 수정 완료" };
+    return await this.reviewsService.editReview(
+      review_id,
+      uid,
+      createReviewDTO,
+    );
   }
 
   // 리뷰 삭제
@@ -77,7 +80,6 @@ export class ReviewsController {
   @UseGuards(FirebaseAuthGuard)
   async deleteReview(@Param("review_id") review_id: number, @Request() req) {
     const { uid } = req.user;
-    await this.reviewsService.deleteReview(review_id, uid);
-    return { message: "Review 삭제 완료" };
+    return await this.reviewsService.deleteReview(review_id, uid);
   }
 }
