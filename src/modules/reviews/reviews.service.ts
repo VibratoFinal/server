@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Reviews } from "./entity/reviews.entity";
-import { Repository } from "typeorm";
+import { DeleteResult, InsertResult, Repository, UpdateResult } from "typeorm";
 import { CreateReviewDTO } from "./dto/create-reviews.dto";
 import { Comments } from "../comments/entity/comments.entity";
 import { Users } from "../auth/entity/auth.entity";
@@ -28,12 +28,13 @@ export class ReviewsService {
   }
 
   // 리뷰 작성
-  async addReview(uid: string, review: CreateReviewDTO) {
+  async addReview(uid: string, review: CreateReviewDTO): Promise<InsertResult> {
     const user = await this.findUserByUid(uid);
 
     return await this.reviewRepository.insert({
       user_uid: user.uid,
       rated: review.rated,
+      title: review.title,
       contents: review.contents,
       type_id: review.type_id,
     });
@@ -63,9 +64,9 @@ export class ReviewsService {
   // 리뷰 수정
   async editReview(
     reviewId: number,
-    createReviewDTO: CreateReviewDTO,
     uid: string,
-  ): Promise<void> {
+    createReviewDTO: CreateReviewDTO,
+  ): Promise<UpdateResult> {
     const { rated, contents } = createReviewDTO;
     await this.findReview(reviewId, uid);
 
@@ -77,10 +78,12 @@ export class ReviewsService {
     if (updateReivew.affected === 0) {
       throw new HttpException("Review not found", HttpStatus.NOT_FOUND);
     }
+
+    return updateReivew;
   }
 
   // 리뷰 삭제
-  async deleteReview(reviewId: number, uid: string): Promise<void> {
+  async deleteReview(reviewId: number, uid: string): Promise<DeleteResult> {
     await this.findReview(reviewId, uid);
 
     const deleteComments = await this.commentRepository.delete({
@@ -98,9 +101,11 @@ export class ReviewsService {
     if (deleteReview.affected === 0) {
       throw new HttpException("Review not found", HttpStatus.NOT_FOUND);
     }
+
+    return deleteReview;
   }
 
-  private async findReview(reviewId: number, uid: string) {
+  private async findReview(reviewId: number, uid: string): Promise<Reviews> {
     const review = await this.reviewRepository.findOne({
       where: {
         review_id: reviewId,

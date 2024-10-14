@@ -5,6 +5,9 @@ export class CreateReviewDTO {
   rated: number;
 
   @IsString()
+  title: string;
+
+  @IsString()
   contents: string;
 
   @IsString()
