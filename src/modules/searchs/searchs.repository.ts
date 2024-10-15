@@ -116,7 +116,6 @@ export class SearchsRepository {
           name: res.name,
           artist_names: res.artists.map(artist => artist.name),
           preview_url: res.preview_url,
-          spotify_url: res.external_urls.spotify,
           track_number: res.track_number,
           duration,
           avg_rated,
