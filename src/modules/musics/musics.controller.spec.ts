@@ -34,7 +34,7 @@ describe("MusicsController", () => {
     image_url: "https://example.com/test-track.jpg",
     album_spotify_url: "https://spotify.com/test-album",
     release_date: new Date("2023-01-01"),
-    duration: 180,
+    duration: "00:00",
     album_artists: [],
     avg_rated: 4.5,
     count_rated: 100,

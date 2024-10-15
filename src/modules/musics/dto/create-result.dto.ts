@@ -38,8 +38,8 @@ export class TrackDTO {
   @IsDate()
   release_date: Date;
 
-  @IsNumber()
-  duration: number;
+  @IsString()
+  duration: string;
 
   @IsArray()
   album_artists: ArtistOtherDTO[];

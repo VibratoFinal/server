@@ -13,11 +13,11 @@ import { SearchsService } from "./searchs.service";
 import { SkipAuthOptional } from "@/common/decorators/skip-auth-optional.decorator";
 import { getUid } from "@/common/utils/helpers";
 
-@Controller("search/single")
+@Controller("search")
 export class SearchsController {
   constructor(private readonly searchService: SearchsService) {}
 
-  @Put("/track")
+  @Put("/single/track")
   @SkipAuthOptional()
   @HttpCode(202)
   async getTrack(@Request() req, @Body() body: SearchDTO): Promise<TrackDTO> {
@@ -25,7 +25,7 @@ export class SearchsController {
     return this.searchService.getTrack(uid, body.type_id);
   }
 
-  @Put("/track/:type_id")
+  @Put("/single/track/:type_id")
   @SkipAuthOptional()
   @HttpCode(202)
   async getTrackByParam(
@@ -36,7 +36,7 @@ export class SearchsController {
     return this.searchService.getTrack(uid, type_id);
   }
 
-  @Put("/track_query")
+  @Put("/single/track_query")
   @SkipAuthOptional()
   @HttpCode(202)
   async getTrackByQuery(
@@ -47,7 +47,7 @@ export class SearchsController {
     return this.searchService.getTrack(uid, query.type_id);
   }
 
-  @Put("/album")
+  @Put("/single/album")
   @SkipAuthOptional()
   @HttpCode(202)
   async getAlbum(@Request() req, @Body() body: SearchDTO): Promise<AlbumDTO> {
@@ -55,7 +55,7 @@ export class SearchsController {
     return this.searchService.getAlbum(uid, body.type_id);
   }
 
-  @Put("/album/:type_id")
+  @Put("/single/album/:type_id")
   @SkipAuthOptional()
   @HttpCode(202)
   async getAlbumByParam(
@@ -66,7 +66,7 @@ export class SearchsController {
     return this.searchService.getAlbum(uid, type_id);
   }
 
-  @Put("/album_query")
+  @Put("/single/album_query")
   @SkipAuthOptional()
   @HttpCode(202)
   async getAlbumByQuery(
@@ -77,7 +77,7 @@ export class SearchsController {
     return this.searchService.getAlbum(uid, query.type_id);
   }
 
-  @Put("/artist")
+  @Put("/single/artist")
   @SkipAuthOptional()
   @HttpCode(202)
   async getArtist(@Request() req, @Body() body: SearchDTO): Promise<ArtistDTO> {
@@ -85,7 +85,7 @@ export class SearchsController {
     return this.searchService.getArtist(uid, body.type_id);
   }
 
-  @Put("/artist/:type_id")
+  @Put("/single/artist/:type_id")
   @SkipAuthOptional()
   @HttpCode(202)
   async getArtistByParam(
@@ -96,7 +96,7 @@ export class SearchsController {
     return this.searchService.getArtist(uid, type_id);
   }
 
-  @Put("/artist_query")
+  @Put("/single/artist_query")
   @SkipAuthOptional()
   @HttpCode(202)
   async getArtistByQuery(
@@ -105,5 +105,16 @@ export class SearchsController {
   ): Promise<ArtistDTO> {
     const uid = getUid(req);
     return this.searchService.getArtist(uid, query.type_id);
+  }
+
+  @Put("/rest/tracks")
+  @SkipAuthOptional()
+  @HttpCode(202)
+  async getRestTracks(
+    @Request() req,
+    @Body() body: SearchDTO,
+  ): Promise<TrackDTO[]> {
+    const uid = getUid(req);
+    return this.searchService.getRestTracksInAlbums(uid, body.type_id);
   }
 }

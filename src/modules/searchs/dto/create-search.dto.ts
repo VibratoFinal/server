@@ -71,16 +71,19 @@ export class AlbumDTO {
 
 export class TrackDTO {
   @IsString()
+  id?: string;
+
+  @IsString()
   name: string;
 
   @IsUrl()
-  image_url: string;
+  image_url?: string;
 
   @IsArray()
   artist_names: string[];
 
   @IsDate()
-  release_date: Date;
+  release_date?: Date;
 
   @IsUrl()
   preview_url: string;
@@ -91,8 +94,8 @@ export class TrackDTO {
   @IsNumber()
   track_number: number;
 
-  @IsNumber()
-  duration: number;
+  @IsString()
+  duration: string;
 
   @IsNumber()
   avg_rated: number;
@@ -104,10 +107,10 @@ export class TrackDTO {
   liked: boolean;
 
   @IsNotEmpty()
-  album: forOthersDTO;
+  album?: forOthersDTO;
 
   @IsArray()
-  artists: forOthersDTO[];
+  artists?: forOthersDTO[];
 }
 
 export class forOthersDTO {
