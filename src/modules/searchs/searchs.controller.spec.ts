@@ -40,7 +40,7 @@ describe("SearchsController", () => {
     preview_url: "https://example.com/test-track-preview.mp3",
     spotify_url: "https://spotify.com/test-track",
     track_number: 1,
-    duration: 180,
+    duration: "00:00",
     avg_rated: 4.5,
     count_rated: 100,
     liked: true,
