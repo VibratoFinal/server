@@ -89,7 +89,7 @@ export class TrackDTO {
   preview_url: string;
 
   @IsUrl()
-  spotify_url: string;
+  spotify_url?: string;
 
   @IsNumber()
   track_number: number;
