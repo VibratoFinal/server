@@ -1,9 +1,9 @@
 import {
   Body,
   Controller,
-  Get,
   HttpCode,
   Param,
+  Put,
   Query,
   Request,
 } from "@nestjs/common";
@@ -22,7 +22,7 @@ import { getUid } from "@/common/utils/helpers";
 export class MusicsController {
   constructor(private readonly musicsService: MusicsService) {}
 
-  @Get("/all")
+  @Put("/all")
   @SkipAuthOptional()
   async searchAll(
     @Request() req,
@@ -32,7 +32,7 @@ export class MusicsController {
     return this.musicsService.searchAll(uid, body.search_content);
   }
 
-  @Get("/all/:search_content")
+  @Put("/all/:search_content")
   @SkipAuthOptional()
   async searchAllByParam(
     @Request() req,
@@ -42,7 +42,7 @@ export class MusicsController {
     return this.musicsService.searchAll(uid, search_content);
   }
 
-  @Get("/all_query")
+  @Put("/all_query")
   @SkipAuthOptional()
   @HttpCode(202)
   async searchAllByQuery(
@@ -53,7 +53,7 @@ export class MusicsController {
     return this.musicsService.searchAll(uid, query.search_content);
   }
 
-  @Get("/tracks")
+  @Put("/tracks")
   @SkipAuthOptional()
   @HttpCode(202)
   async searchTrack(
@@ -64,7 +64,7 @@ export class MusicsController {
     return this.musicsService.searchTrack(uid, body.search_content);
   }
 
-  @Get("/tracks/:search_content")
+  @Put("/tracks/:search_content")
   @SkipAuthOptional()
   @HttpCode(202)
   async searchTrackByParam(
@@ -75,7 +75,7 @@ export class MusicsController {
     return this.musicsService.searchTrack(uid, search_content);
   }
 
-  @Get("/tracks_query")
+  @Put("/tracks_query")
   @SkipAuthOptional()
   @HttpCode(202)
   async searchTrackByQuery(
@@ -86,7 +86,7 @@ export class MusicsController {
     return this.musicsService.searchTrack(uid, query.search_content);
   }
 
-  @Get("/artists")
+  @Put("/artists")
   @SkipAuthOptional()
   @HttpCode(202)
   async searchArtist(
@@ -97,7 +97,7 @@ export class MusicsController {
     return this.musicsService.searchArtist(uid, body.search_content);
   }
 
-  @Get("/artists/:search_content")
+  @Put("/artists/:search_content")
   @SkipAuthOptional()
   @HttpCode(202)
   async searchArtistByParam(
@@ -108,7 +108,7 @@ export class MusicsController {
     return this.musicsService.searchArtist(uid, search_content);
   }
 
-  @Get("/artists_query")
+  @Put("/artists_query")
   @SkipAuthOptional()
   @HttpCode(202)
   async searchArtistByQuery(
@@ -119,7 +119,7 @@ export class MusicsController {
     return this.musicsService.searchArtist(uid, query.search_content);
   }
 
-  @Get("/albums")
+  @Put("/albums")
   @SkipAuthOptional()
   @HttpCode(202)
   async searchAlbum(
@@ -130,7 +130,7 @@ export class MusicsController {
     return this.musicsService.searchAlbum(uid, body.search_content);
   }
 
-  @Get("/albums/:search_content")
+  @Put("/albums/:search_content")
   @SkipAuthOptional()
   @HttpCode(202)
   async searchAlbumByParam(
@@ -141,7 +141,7 @@ export class MusicsController {
     return this.musicsService.searchAlbum(uid, search_content);
   }
 
-  @Get("/albums_query")
+  @Put("/albums_query")
   @SkipAuthOptional()
   @HttpCode(202)
   async searchAlbumByQuery(

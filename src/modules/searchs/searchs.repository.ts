@@ -7,6 +7,7 @@ import {
   TrackDTO,
 } from "./dto/create-search.dto";
 import { LikesService } from "../likes/likes.service";
+import { convertMsToString } from "@/common/utils/helpers";
 
 @Injectable()
 export class SearchsRepository {
@@ -69,12 +70,15 @@ export class SearchsRepository {
     res: any,
     track_id: string,
   ): Promise<TrackDTO> {
-    const [avg, count] = await this.reviewsService.getRateReview(track_id);
+    const [avg_rated, count_rated] =
+      await this.reviewsService.getRateReview(track_id);
     const liked = uid
       ? await this.likesService.checkLikeTypeid(uid, {
           type_id: track_id,
         })
       : false;
+    const duration = convertMsToString(res.duration_ms);
+
     return {
       name: res.name,
       image_url: res.album.images[0].url,
@@ -83,13 +87,43 @@ export class SearchsRepository {
       preview_url: res.preview_url,
       spotify_url: res.external_urls.spotify,
       track_number: res.track_number,
-      duration: res.duration_ms,
-      avg_rated: avg,
-      count_rated: count,
+      duration,
+      avg_rated,
+      count_rated,
       liked,
       album: await this.transformAlbumForOthers(uid, res.album),
       artists: await this.transformArtistForOthers(uid, res.artists),
     };
+  }
+
+  public async transformRestTracks(
+    uid: string,
+    items: any[],
+  ): Promise<TrackDTO[]> {
+    return Promise.all(
+      items.map(async res => {
+        const [avg_rated, count_rated] =
+          await this.reviewsService.getRateReview(res.id);
+        const liked = uid
+          ? await this.likesService.checkLikeTypeid(uid, {
+              type_id: res.id,
+            })
+          : false;
+        const duration = convertMsToString(res.duration_ms);
+
+        return {
+          id: res.id,
+          name: res.name,
+          artist_names: res.artists.map(artist => artist.name),
+          preview_url: res.preview_url,
+          track_number: res.track_number,
+          duration,
+          avg_rated,
+          count_rated,
+          liked,
+        };
+      }),
+    );
   }
 
   private async transformArtistForOthers(

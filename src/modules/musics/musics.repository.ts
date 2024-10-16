@@ -8,6 +8,7 @@ import {
 } from "./dto/create-result.dto";
 import { ReviewsService } from "../reviews/reviews.service";
 import { LikesService } from "../likes/likes.service";
+import { convertMsToString } from "@/common/utils/helpers";
 
 @Injectable()
 export class MusicsRepository {
@@ -19,12 +20,14 @@ export class MusicsRepository {
   public async transformTracks(uid: string, items: any[]): Promise<TrackDTO[]> {
     return Promise.all(
       items.map(async item => {
-        const [avg, count] = await this.reviewsService.getRateReview(item.id);
+        const [avg_rated, count_rated] =
+          await this.reviewsService.getRateReview(item.id);
         const liked = uid
           ? await this.likesService.checkLikeTypeid(uid, {
               type_id: item.id,
             })
           : false;
+        const duration = convertMsToString(item.duration_ms);
 
         return {
           id: item.id,
@@ -37,10 +40,10 @@ export class MusicsRepository {
           image_url: item.album.images[0].url,
           album_spotify_url: item.album.external_urls.spotify,
           release_date: item.album.release_date,
-          duration: item.duration,
+          duration,
           album_artists: await this.transformArtistsInOthers(uid, item.artists),
-          avg_rated: avg,
-          count_rated: count,
+          avg_rated,
+          count_rated,
           liked,
         };
       }),
