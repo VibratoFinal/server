@@ -13,7 +13,7 @@ import {
 import { ReviewsService } from "./reviews.service";
 import { CreateReviewDTO } from "./dto/create-reviews.dto";
 import { FirebaseAuthGuard } from "@/common/guards/firebase-auth.guard";
-import { SkipAuth } from "@/common/decorators/skip-auth.decorator";
+import { SkipAuthOptional } from "@/common/decorators/skip-auth-optional.decorator";
 
 // 리뷰 작성 add
 // 리뷰 전체 조회 getAll
@@ -40,11 +40,12 @@ export class ReviewsController {
   }
 
   // type_id (앨범,트랙,아티스트) 리뷰 전체 조회
-  @Get(":type_id")
-  @HttpCode(200)
-  @SkipAuth()
-  async getAllReviews(@Param("type_id") typeId: string) {
-    return await this.reviewsService.getAllReviews(typeId);
+  @Put()
+  @HttpCode(202)
+  @SkipAuthOptional()
+  async getAllReviews(@Request() req, @Body() type_id: string) {
+    // const json = JSON.stringify(type_id
+    return await this.reviewsService.getAllReviews(req, type_id);
   }
 
   // 내가 쓴 리뷰 조회

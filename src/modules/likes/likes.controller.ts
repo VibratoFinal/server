@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  Param,
   Post,
   Request,
   UseGuards,
@@ -44,25 +45,53 @@ export class LikesController {
 
   @Delete("/review")
   @UseGuards(FirebaseAuthGuard)
-  async removeLikeReview(
+  async deleteLikeReview(
     @Request() req,
     @Body() createLikesReviewDTO: CreateLikesReviewDTO,
   ) {
     const { uid } = req.user;
-    return await this.likesService.removeLikeReview(uid, createLikesReviewDTO);
+    return await this.likesService.deleteLikeReview(uid, createLikesReviewDTO);
   }
 
   @Delete("/review/comment")
   @UseGuards(FirebaseAuthGuard)
-  async removeLikeComment(
+  async deleteLikeComment(
     @Request() req,
     @Body() createLikesCommentDTO: CreateLikesCommentDTO,
   ) {
     const { uid } = req.user;
-    return await this.likesService.removeLikeComment(
+    return await this.likesService.deleteLikeComment(
       uid,
       createLikesCommentDTO,
     );
+  }
+
+  @Get("/review/:reviewId")
+  @HttpCode(202)
+  @SkipAuthOptional()
+  async getLikeReview(@Request() req, @Param("reviewId") reviewId: string) {
+    if (req.user === undefined) {
+      return false;
+    }
+    const { uid } = req.user;
+    const parsedReviewId = parseInt(reviewId, 10);
+    return await this.likesService.checkLikeReviewId(uid, parsedReviewId);
+  }
+
+  @Get("/review/:reviewId/comment/:commentId")
+  @HttpCode(202)
+  @SkipAuthOptional()
+  async getLikeComment(
+    @Request() req,
+    @Param("reviewId") reviewId: number,
+    @Param("commentId") commentId: number,
+  ) {
+    if (req.user === undefined) {
+      return false;
+    }
+    const { uid } = req.user;
+
+    return await this.likesService.checkLikeCommentId(uid, reviewId, commentId);
   }
 
   @Post("/type")
@@ -79,12 +108,12 @@ export class LikesController {
   @Delete("/type")
   @HttpCode(204)
   @UseGuards(FirebaseAuthGuard)
-  async removeLikeType(
+  async deleteLikeType(
     @Request() req,
     @Body() createLikesTypeDTO: CreateLikesTypeDTO,
   ) {
     const { uid } = req.user;
-    return await this.likesService.removeLikeType(uid, createLikesTypeDTO);
+    return await this.likesService.deleteLikeType(uid, createLikesTypeDTO);
   }
 
   @Get("/type")

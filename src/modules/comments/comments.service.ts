@@ -5,6 +5,7 @@ import { DeleteResult, InsertResult, Repository, UpdateResult } from "typeorm";
 import { CreateCommentDTO } from "./dto/create-comments.dto";
 import { Reviews } from "@modules/reviews/entity/reviews.entity";
 import { Users } from "../auth/entity/auth.entity";
+import { LikesService } from "../likes/likes.service";
 
 // 코멘트 작성 add
 // 수정 edit
@@ -22,6 +23,8 @@ export class CommentsService {
     private reviewRepository: Repository<Reviews>,
     @InjectRepository(Users)
     private usersRepository: Repository<Users>,
+
+    private readonly likesService: LikesService,
   ) {}
   public async findUserByUid(uid: string): Promise<Users> {
     const user = await this.usersRepository.findOne({ where: { uid } });
@@ -72,6 +75,7 @@ export class CommentsService {
     const getUid = await this.commentRepository.find({
       where: { user_uid: uid },
     });
+
     if (!getUid.length) {
       throw new HttpException("User Comment not found", HttpStatus.NOT_FOUND);
     }

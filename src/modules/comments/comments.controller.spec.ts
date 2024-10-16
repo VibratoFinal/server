@@ -67,7 +67,7 @@ describe("CommentsController", () => {
         createCommentDTO,
       );
       expect(commentsService.addComment).toHaveBeenCalledWith(
-        "mock-uid",
+        req.user.uid,
         reviewId,
         createCommentDTO,
       );
@@ -95,7 +95,9 @@ describe("CommentsController", () => {
 
       const result = await controller.getUserComments(req);
 
-      expect(commentsService.getUserComments).toHaveBeenCalledWith("mock-uid");
+      expect(commentsService.getUserComments).toHaveBeenCalledWith(
+        req.user.uid,
+      );
       expect(result).toBe(mockComments);
     });
   });
@@ -119,7 +121,7 @@ describe("CommentsController", () => {
       expect(commentsService.editComments).toHaveBeenCalledWith(
         reviewId,
         commentId,
-        "mock-uid",
+        req.user.uid,
         createCommentDTO,
       );
       expect(result).toBe(mockEditComment);
@@ -139,7 +141,7 @@ describe("CommentsController", () => {
       expect(commentsService.deleteComment).toHaveBeenCalledWith(
         reviewId,
         commentId,
-        "mock-uid",
+        req.user.uid,
       );
       expect(result).toBe(mockDeleteComment);
     });

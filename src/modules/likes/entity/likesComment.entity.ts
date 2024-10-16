@@ -6,10 +6,10 @@ import {
   Unique,
 } from "typeorm";
 import { Comments } from "@modules/comments/entity/comments.entity";
-import { Users } from "@/modules/auth/entity/auth.entity";
-import { Reviews } from "@/modules/reviews/entity/reviews.entity";
+import { Users } from "@modules/auth/entity/auth.entity";
+import { Reviews } from "@modules/reviews/entity/reviews.entity";
 @Entity()
-@Unique(["comment"])
+@Unique(["comment_id"])
 export class LikesComments {
   @PrimaryGeneratedColumn()
   id: number;
@@ -24,7 +24,9 @@ export class LikesComments {
   @JoinColumn({ name: "review_id" })
   review_id: Reviews;
 
-  @ManyToOne(() => Comments, comment => comment.likes, { onDelete: "CASCADE" })
-  @JoinColumn({ name: "comment" })
-  comment: Comments;
+  @ManyToOne(() => Comments, comment => comment.comment_id, {
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({ name: "comment_id" })
+  comment_id: Comments;
 }

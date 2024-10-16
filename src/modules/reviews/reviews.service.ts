@@ -5,6 +5,21 @@ import { DeleteResult, InsertResult, Repository, UpdateResult } from "typeorm";
 import { CreateReviewDTO } from "./dto/create-reviews.dto";
 import { Comments } from "../comments/entity/comments.entity";
 import { Users } from "../auth/entity/auth.entity";
+import { LikesService } from "../likes/likes.service";
+
+export class CreateResponseReviewDTO {
+  review_id: number;
+  user_uid: string;
+  rated: number;
+  title: string;
+  contents: string;
+  type_id: string;
+  created_at: Date;
+  updated_at: Date;
+  comments: any[];
+  likes: any[];
+  liked: boolean;
+}
 
 @Injectable()
 export class ReviewsService {
@@ -17,6 +32,8 @@ export class ReviewsService {
 
     @InjectRepository(Users)
     private usersRepository: Repository<Users>,
+
+    private readonly likesService: LikesService,
   ) {}
 
   private async findUserByUid(uid: string): Promise<Users> {
@@ -41,14 +58,48 @@ export class ReviewsService {
   }
 
   // type_id (트랙,앨범,아티스트) 리뷰 전체 조회
-  async getAllReviews(typeId: string): Promise<Reviews[]> {
+  async getAllReviews(
+    uid: string,
+    typeId: string,
+  ): Promise<CreateResponseReviewDTO[]> {
+    console.log("typeID", typeId); // "test123"
+
     const allReviews = await this.reviewRepository.find({
       where: { type_id: typeId },
     });
+
     if (!allReviews.length) {
       throw new HttpException("Review not found", HttpStatus.NOT_FOUND);
     }
-    return allReviews;
+    console.log("allReviews", allReviews); // []
+
+    const reviewsWithLikes = await Promise.all(
+      allReviews.map(async review => {
+        const liked = uid
+          ? await this.likesService.checkLikeTypeid(uid, {
+              type_id: review.type_id,
+            })
+          : false;
+        review.liked = liked;
+        console.log(liked);
+
+        return {
+          review_id: review.review_id,
+          user_uid: review.user_uid,
+          rated: review.rated,
+          title: review.title,
+          contents: review.contents,
+          type_id: review.type_id,
+          created_at: review.created_at,
+          updated_at: review.updated_at,
+          comments: review.comments,
+          likes: review.likes,
+          liked,
+        };
+      }),
+    );
+
+    return reviewsWithLikes;
   }
 
   async getUserReviews(uid: string): Promise<Reviews[]> {

@@ -42,4 +42,7 @@ export class Reviews {
     eager: true,
   })
   likes: LikesReviews[];
+
+  @Column({ default: false })
+  liked: boolean;
 }
