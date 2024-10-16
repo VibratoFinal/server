@@ -121,10 +121,16 @@ export class forOthersDTO {
   name: string;
 
   @IsUrl()
-  spotify_url: string;
+  preview_url?: string;
+
+  @IsUrl()
+  spotify_url?: string;
 
   @IsNumber()
-  avg_rate: number;
+  avg_rated: number;
+
+  @IsNumber()
+  count_rated?: number;
 
   @IsBoolean()
   liked: boolean;

@@ -137,11 +137,15 @@ export class SearchsRepository {
               type_id: item.id,
             })
           : false;
+
+        const [avg_rated, count_rated] =
+          await this.reviewsService.getRateReview(item.id);
         return {
           id: item.id,
           name: item.name,
           spotify_url: item.external_urls.spotify,
-          avg_rate: await this.reviewsService.getRateReview(item.id)[0],
+          avg_rated,
+          count_rated,
           liked,
         };
       }),
@@ -159,12 +163,18 @@ export class SearchsRepository {
               type_id: item.id,
             })
           : false;
+
+        const [avg_rated, count_rated] =
+          await this.reviewsService.getRateReview(item.id);
+        const duration = convertMsToString(item.duration_ms);
         return {
           id: item.id,
           name: item.name,
-          spotify_url: item.external_urls.spotify,
+          preview_url: item.preview_url,
+          duration,
           track_number: item.track_number,
-          avg_rate: await this.reviewsService.getRateReview(item.id)[0],
+          avg_rated,
+          count_rated,
           liked,
         };
       }),
@@ -175,7 +185,9 @@ export class SearchsRepository {
     uid: string,
     res: any,
   ): Promise<forOthersDTO> {
-    const avg = await this.reviewsService.getRateReview(res.id);
+    const [avg_rated, count_rated] = await this.reviewsService.getRateReview(
+      res.id,
+    );
     const liked = uid
       ? await this.likesService.checkLikeTypeid(uid, {
           type_id: res.id,
@@ -185,7 +197,8 @@ export class SearchsRepository {
       id: res.id,
       name: res.name,
       spotify_url: res.external_urls.spotify,
-      avg_rate: avg[0],
+      avg_rated,
+      count_rated,
       liked,
     };
   }
