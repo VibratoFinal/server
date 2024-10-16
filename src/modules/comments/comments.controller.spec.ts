@@ -1,12 +1,13 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { CommentsController } from "@modules/comments/comments.controller";
-import { CommentsService } from "./comments.service";
+import { CommentsService, CreateResponseCommentDTO } from "./comments.service";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { Comments } from "./entity/comments.entity";
 import { Reviews } from "../reviews/entity/reviews.entity";
 import { FirebaseService } from "@/configs/firebase/firebase.service";
 import { Users } from "../auth/entity/auth.entity";
 import { DeleteResult, InsertResult, UpdateResult } from "typeorm";
+import { SimpleLikesReviews } from "../reviews/reviews.service";
 
 describe("CommentsController", () => {
   let controller: CommentsController;
@@ -17,15 +18,16 @@ describe("CommentsController", () => {
   const reviewId = 1;
   const commentId = 2;
   const createCommentDTO = { contents: "댓글작성 테스트" };
-  const mockComments: Comments[] = [
+
+  const mockComments: CreateResponseCommentDTO[] = [
     {
       comment_id: 1,
-      user_uid: req.user.uid,
       contents: "내가 쓴 댓글 조회 테스트",
+      nickname: "test",
       created_at: new Date(),
       updated_at: new Date(),
-      likes: [],
-      review: null,
+      likes: [new SimpleLikesReviews("mock-uid")],
+      liked: false,
     },
   ];
   beforeEach(async () => {
@@ -80,7 +82,7 @@ describe("CommentsController", () => {
       jest
         .spyOn(commentsService, "getAllComments")
         .mockResolvedValue(mockComments);
-      const result = await controller.getAllComments(reviewId);
+      const result = await controller.getAllComments(req.user, reviewId);
 
       expect(commentsService.getAllComments).toHaveBeenCalledWith(reviewId);
       expect(result).toEqual(mockComments);

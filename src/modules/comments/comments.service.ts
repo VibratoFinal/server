@@ -6,12 +6,23 @@ import { CreateCommentDTO } from "./dto/create-comments.dto";
 import { Reviews } from "@modules/reviews/entity/reviews.entity";
 import { Users } from "../auth/entity/auth.entity";
 import { LikesService } from "../likes/likes.service";
+import { ReviewsService, SimpleLikesReviews } from "../reviews/reviews.service";
 
 // 코멘트 작성 add
 // 수정 edit
 // 전체조회 getAll
 // 내가 쓴 댓글 조회 get // UID 필요
 // 삭제 delete
+
+export class CreateResponseCommentDTO {
+  comment_id: number;
+  nickname: string;
+  contents: string;
+  created_at: Date;
+  updated_at: Date;
+  likes: SimpleLikesReviews[];
+  liked: boolean;
+}
 
 @Injectable()
 export class CommentsService {
@@ -25,6 +36,7 @@ export class CommentsService {
     private usersRepository: Repository<Users>,
 
     private readonly likesService: LikesService,
+    private readonly reviewsService: ReviewsService,
   ) {}
   public async findUserByUid(uid: string): Promise<Users> {
     const user = await this.usersRepository.findOne({ where: { uid } });
@@ -52,34 +64,126 @@ export class CommentsService {
 
     return await this.commentRepository.insert({
       user_uid: user.uid,
-      review,
+      nickname: user.nickname,
+      review: review,
       contents,
     });
   }
 
   // 해당 리뷰 댓글 전체 조회
-  async getAllComments(reviewId: number): Promise<Comments[]> {
+  async getAllComments(
+    uid: string,
+    reviewId: number,
+  ): Promise<CreateResponseCommentDTO[]> {
     const allComments = await this.commentRepository.find({
       where: { review: { review_id: reviewId } },
+      relations: ["review"],
     });
+    console.log("해당 리뷰 댓글 전체 조회 Service", allComments);
 
     if (!allComments.length) {
       throw new HttpException("Comment not found", HttpStatus.NOT_FOUND);
     }
 
-    return allComments;
+    const commentsWithLikes = await Promise.all(
+      allComments.map(async comment => {
+        const liked = uid
+          ? await this.likesService.checkLikeReviewId(uid, {
+              review_id: comment.review.review_id,
+            })
+          : false;
+        const nickname = await this.reviewsService.findNickname(uid);
+        console.log("Check Like Inputs: ", {
+          review_id: comment.review.review_id,
+        });
+
+        return {
+          comment_id: comment.comment_id,
+          nickname,
+          contents: comment.contents,
+          created_at: comment.created_at,
+          updated_at: comment.updated_at,
+          likes: comment.likes.map(like => ({
+            id: like.id,
+            user_uid: like.user.uid,
+          })),
+          liked,
+        };
+      }),
+    );
+
+    return commentsWithLikes;
+  }
+  async getComments(
+    uid: string,
+    reviewId: number,
+    commentId: number,
+  ): Promise<CreateResponseCommentDTO> {
+    const comment = await this.commentRepository.findOne({
+      where: { review: { review_id: reviewId }, comment_id: commentId },
+    });
+    console.log("특정 댓글 조회", uid, commentId, reviewId);
+
+    if (!comment) {
+      throw new HttpException("Comment not found", HttpStatus.NOT_FOUND);
+    }
+    const liked = uid
+      ? await this.likesService.checkLikeCommentId(uid, {
+          review_id: reviewId,
+          comment_id: commentId,
+        })
+      : false;
+
+    return {
+      comment_id: comment.comment_id,
+      nickname: comment.nickname,
+      contents: comment.contents,
+      created_at: comment.created_at,
+      updated_at: comment.updated_at,
+      likes: comment.likes.map(like => ({
+        id: like.id,
+        user_uid: like.user.uid,
+      })),
+      liked,
+    };
   }
 
   // 내가 쓴 댓글 조회
-  async getUserComments(uid: string): Promise<Comments[]> {
+  async getUserComments(uid: string): Promise<CreateResponseCommentDTO[]> {
     const getUid = await this.commentRepository.find({
       where: { user_uid: uid },
+      relations: ["review"],
     });
 
     if (!getUid.length) {
       throw new HttpException("User Comment not found", HttpStatus.NOT_FOUND);
     }
-    return getUid;
+
+    const commentsWithLikes = await Promise.all(
+      getUid.map(async comment => {
+        const liked = uid
+          ? await this.likesService.checkLikeReviewId(uid, {
+              review_id: comment.review?.review_id,
+            })
+          : false;
+        const nickname = await this.reviewsService.findNickname(uid);
+
+        return {
+          comment_id: comment.comment_id,
+          nickname,
+          contents: comment.contents,
+          created_at: comment.created_at,
+          updated_at: comment.updated_at,
+          likes: comment.likes.map(like => ({
+            id: like.id,
+            user_uid: like.user.uid,
+          })),
+          liked,
+        };
+      }),
+    );
+
+    return commentsWithLikes;
   }
 
   // 댓글 수정

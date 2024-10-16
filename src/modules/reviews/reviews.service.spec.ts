@@ -7,6 +7,10 @@ import { FirebaseService } from "@/configs/firebase/firebase.service";
 import { Users } from "../auth/entity/auth.entity";
 import { DeleteResult, InsertResult, Repository, UpdateResult } from "typeorm";
 import { CreateReviewDTO } from "./dto/create-reviews.dto";
+import { LikesService } from "../likes/likes.service";
+import { LikesReviews } from "../likes/entity/likesReview.entity";
+import { LikesComments } from "../likes/entity/likesComment.entity";
+import { LikesType } from "../likes/entity/likesType.entity";
 
 describe("ReivewsService", () => {
   let reviewsService: ReviewsService;
@@ -55,6 +59,7 @@ describe("ReivewsService", () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ReviewsService,
+        LikesService,
         { provide: FirebaseService, useValue: {} },
         {
           provide: getRepositoryToken(Reviews),
@@ -78,6 +83,18 @@ describe("ReivewsService", () => {
           useValue: {
             findOne: jest.fn(),
           },
+        },
+        {
+          provide: getRepositoryToken(LikesReviews),
+          useValue: {},
+        },
+        {
+          provide: getRepositoryToken(LikesComments),
+          useValue: {},
+        },
+        {
+          provide: getRepositoryToken(LikesType),
+          useValue: {},
         },
       ],
     }).compile();
@@ -140,7 +157,7 @@ describe("ReivewsService", () => {
     it("리뷰 전체 조회 테스트", async () => {
       jest.spyOn(reviewsRepository, "find").mockResolvedValue(mockAllReviews);
 
-      const result = await reviewsService.getAllReviews(typeId);
+      const result = await reviewsService.getAllReviews(req.user.uid, typeId);
       expect(result).toEqual(mockAllReviews);
     });
   });

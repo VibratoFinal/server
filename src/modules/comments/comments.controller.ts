@@ -10,15 +10,16 @@ import {
   Request,
   UseGuards,
 } from "@nestjs/common";
-import { CommentsService } from "./comments.service";
+import { CommentsService, CreateResponseCommentDTO } from "./comments.service";
 import { CreateCommentDTO } from "./dto/create-comments.dto";
 import { FirebaseAuthGuard } from "@/common/guards/firebase-auth.guard";
-import { SkipAuth } from "@/common/decorators/skip-auth.decorator";
+import { SkipAuthOptional } from "@/common/decorators/skip-auth-optional.decorator";
 
 @Controller("review")
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
+  // 댓글 작성
   @Post(":review_id/comments")
   @HttpCode(201)
   @UseGuards(FirebaseAuthGuard)
@@ -33,23 +34,46 @@ export class CommentsController {
   }
 
   // 해당 리뷰 전체 댓글 조회
-
-  @Get(":reviewId/comments")
+  @Get(":review_id/comments")
   @HttpCode(200)
-  @SkipAuth()
-  async getAllComments(@Param("reviewId") reviewId: number) {
-    return await this.commentsService.getAllComments(reviewId);
+  @SkipAuthOptional()
+  async getAllComments(
+    @Request() req,
+    @Param("review_id") review_id: number,
+  ): Promise<CreateResponseCommentDTO[]> {
+    const uid = req.user ? req.user.uid : null;
+    console.log("해당 리뷰 전체 댓글 조회", uid);
+    console.log("해당 리뷰 전체 댓글 조회", review_id);
+
+    return await this.commentsService.getAllComments(uid, review_id);
+  }
+
+  // 특정 댓글 조회
+  @Get(":review_id/comments/:comment_id")
+  @HttpCode(200)
+  @SkipAuthOptional()
+  async getComments(
+    @Request() req,
+    @Param("review_id") review_id: number,
+    @Param("comment_id") comment_id: number,
+  ): Promise<CreateResponseCommentDTO> {
+    const uid = req.user ? req.user.uid : null;
+    console.log("특정 댓글 조회", uid);
+    console.log("특정 댓글 조회", review_id);
+    console.log("특정 댓글 조회", comment_id);
+    return await this.commentsService.getComments(uid, review_id, comment_id);
   }
 
   // 내가 쓴 댓글 조회
   @Get("comments")
   @HttpCode(200)
   @UseGuards(FirebaseAuthGuard)
-  async getUserComments(@Request() req) {
+  async getUserComments(@Request() req): Promise<CreateResponseCommentDTO[]> {
     const { uid } = req.user;
     return await this.commentsService.getUserComments(uid);
   }
 
+  // 댓글 수정
   @Put(":reviewId/comments/:commentId")
   @HttpCode(200)
   @UseGuards(FirebaseAuthGuard)
@@ -69,6 +93,7 @@ export class CommentsController {
     );
   }
 
+  // 댓글 삭제
   @Delete(":reviewId/comments/:commentId")
   @HttpCode(200)
   @UseGuards(FirebaseAuthGuard)

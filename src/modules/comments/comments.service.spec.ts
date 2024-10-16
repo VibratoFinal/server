@@ -1,13 +1,17 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { CommentsService } from "@modules/comments/comments.service";
+import {
+  CommentsService,
+  CreateResponseCommentDTO,
+} from "@modules/comments/comments.service";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { Comments } from "./entity/comments.entity";
 import { Reviews } from "../reviews/entity/reviews.entity";
-import { ReviewsService } from "../reviews/reviews.service";
+import { ReviewsService, SimpleLikesReviews } from "../reviews/reviews.service";
 import { FirebaseService } from "@/configs/firebase/firebase.service";
 import { Users } from "../auth/entity/auth.entity";
 import { DeleteResult, InsertResult, Repository, UpdateResult } from "typeorm";
 import { CreateCommentDTO } from "./dto/create-comments.dto";
+import { LikesService } from "../likes/likes.service";
 
 describe("CommentsService", () => {
   let commentsService: CommentsService;
@@ -20,20 +24,21 @@ describe("CommentsService", () => {
   const reviewId = 1;
   const commentId = 2;
   const createCommentDTO: CreateCommentDTO = { contents: "댓글 테스트" };
-  const mockUserComments: Comments = {
+  const mockUserComments: CreateResponseCommentDTO = {
     comment_id: commentId,
-    user_uid: req.user.uid,
+    nickname: "test",
     contents: "댓글 테스트",
     created_at: new Date(),
     updated_at: new Date(),
-    likes: [],
-    review: null,
+    likes: [new SimpleLikesReviews("mock-uid")],
+    liked: false,
   };
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CommentsService,
         ReviewsService,
+        LikesService,
         { provide: FirebaseService, useValue: {} },
         {
           provide: getRepositoryToken(Comments),
@@ -137,6 +142,7 @@ describe("CommentsService", () => {
         {
           comment_id: 1,
           user_uid: "mock-uid",
+          nickname: "nickname",
           contents: "이 글 쓴거 나임!",
           created_at: new Date(),
           updated_at: new Date(),
@@ -147,7 +153,10 @@ describe("CommentsService", () => {
 
       jest.spyOn(commentsRepository, "find").mockResolvedValue(mockAllComments);
 
-      const result = await commentsService.getAllComments(reviewId);
+      const result = await commentsService.getAllComments(
+        req.user.uid,
+        reviewId,
+      );
       expect(result).toEqual(mockAllComments);
     });
   });
@@ -158,6 +167,7 @@ describe("CommentsService", () => {
         {
           comment_id: 1,
           user_uid: req.user.uid,
+          nickname: "test",
           contents: "내가 쓴 댓글 조회 테스트",
           created_at: new Date(),
           updated_at: new Date(),
@@ -186,9 +196,9 @@ describe("CommentsService", () => {
         .spyOn(commentsRepository, "update")
         .mockResolvedValue(mockEditComment);
 
-      jest
-        .spyOn(commentsRepository, "findOne")
-        .mockResolvedValue(mockUserComments);
+      // jest
+      //   .spyOn(commentsRepository, "findOne")
+      //   .mockResolvedValue(mockUserComments);
 
       const result = await commentsService.editComments(
         reviewId,
@@ -215,9 +225,9 @@ describe("CommentsService", () => {
         .spyOn(commentsRepository, "delete")
         .mockResolvedValue(mockEditComment);
 
-      jest
-        .spyOn(commentsRepository, "findOne")
-        .mockResolvedValue(mockUserComments);
+      // jest
+      //   .spyOn(commentsRepository, "findOne")
+      //   .mockResolvedValue(mockUserComments);
 
       const result = await commentsService.deleteComment(
         reviewId,

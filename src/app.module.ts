@@ -48,7 +48,6 @@ import { LikesType } from "./modules/likes/entity/likesType.entity";
         LikesType,
       ],
       synchronize: true,
-      logging: true,
     }),
     MusicsModule,
     FollowsModule,

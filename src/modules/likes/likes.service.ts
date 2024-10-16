@@ -54,13 +54,19 @@ export class LikesService {
     if (!findReview) {
       throw new HttpException("review not found", HttpStatus.NOT_FOUND);
     }
+    console.log("findReview", findReview);
+
     const user = await this.findUserByUid(uid);
+    console.log("user", user.uid);
+
     try {
       return await this.likesReviewRepository.insert({
-        user_uid: user.uid,
-        review_id: findReview,
+        user: user,
+        review: findReview,
       });
     } catch (error) {
+      console.error(error);
+
       if (error.code === "ER_DUP_ENTRY") {
         throw new HttpException("Already add LikeReview", HttpStatus.CONFLICT);
       }
@@ -85,9 +91,9 @@ export class LikesService {
     const user = await this.findUserByUid(uid);
     try {
       return await this.likesCommentRepository.insert({
-        user_uid: user,
-        review_id: findReview,
-        comment_id: findComment,
+        user: user,
+        review: findReview,
+        comment: findComment,
       });
     } catch (error) {
       if (error.code === "ER_DUP_ENTRY") {
@@ -107,8 +113,8 @@ export class LikesService {
     });
 
     const deleteLikeReview = await this.likesReviewRepository.delete({
-      user_uid: user.uid,
-      review_id: findReview,
+      user: user,
+      review: findReview,
     });
 
     if (deleteLikeReview.affected === 0) {
@@ -135,9 +141,9 @@ export class LikesService {
     });
 
     const deleteLikeComment = await this.likesCommentRepository.delete({
-      user_uid: user,
-      review_id: findReview,
-      comment_id: findComment,
+      user: user,
+      review: findReview,
+      comment: findComment,
     });
 
     if (deleteLikeComment.affected === 0) {
@@ -146,61 +152,48 @@ export class LikesService {
     return deleteLikeComment;
   }
 
-  async checkLikeReviewId(uid: string, reviewId: number): Promise<boolean> {
+  async checkLikeReviewId(
+    uid: string,
+    createReviewDTO: CreateLikesReviewDTO,
+  ): Promise<boolean> {
     const user = await this.findUserByUid(uid);
+    const review_id = createReviewDTO.review_id;
+    console.log("리뷰좋아요 회원uid", user);
+    console.log("리뷰좋아요 리뷰id", review_id);
 
-    try {
-      const results = await this.likesReviewRepository.find({
-        where: {
-          id: reviewId,
-        },
-      });
-      console.log(results);
-      for (const result of results) {
-        if (result.user_uid === user.uid) {
-          return true;
-        }
-      }
+    const results = await this.likesReviewRepository.findOne({
+      where: { review: { review_id } },
+    });
+    console.log("checkLikeReviewId", results);
 
+    if (!results) {
+      console.log(`해당 리뷰(${review_id})에 대한 좋아요 기록이 없습니다.`);
       return false;
-    } catch (error) {
-      console.error(
-        `Error happens while finding whether ${user.nickname} like ${reviewId} :`,
-        error,
-      );
-      throw new HttpException(
-        `Error happens while finding whether ${user.nickname} like ${reviewId}.`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
     }
+    if (results.user.uid === user.uid) {
+      return true;
+    }
+
+    return false;
   }
 
   async checkLikeCommentId(
     uid: string,
-    review_id: number,
-    comment_id: number,
-  ): Promise<boolean> {
+    createLikesCommentDTO: CreateLikesCommentDTO,
+  ) {
     const user = await this.findUserByUid(uid);
+    const review_id = createLikesCommentDTO.review_id;
+    const comment_id = createLikesCommentDTO.comment_id;
     try {
-      const findReview = await this.reviewRepository.findOne({
-        where: { review_id },
-      });
-      const findComment = await this.commentRepository.findOne({
-        where: { comment_id },
-      });
       const results = await this.likesCommentRepository.find({
         where: {
-          comment_id: findComment,
-          review_id: findReview,
+          review: { review_id },
+          comment: { comment_id },
         },
       });
-      for (const result of results) {
-        if (result.user_uid.uid === user.uid) {
-          return true;
-        }
-      }
 
-      return false;
+      const liked = results.some(result => result.user.uid === user.uid);
+      return liked;
     } catch (error) {
       console.error(
         `Error happens while finding whether ${user.nickname} like ${review_id} :`,

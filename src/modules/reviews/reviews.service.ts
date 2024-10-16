@@ -7,17 +7,26 @@ import { Comments } from "../comments/entity/comments.entity";
 import { Users } from "../auth/entity/auth.entity";
 import { LikesService } from "../likes/likes.service";
 
+export class SimpleLikesReviews {
+  id: number;
+  user_uid: string;
+
+  constructor(user_uid: string) {
+    this.user_uid = user_uid;
+  }
+}
+
 export class CreateResponseReviewDTO {
   review_id: number;
-  user_uid: string;
+  nickname: string;
   rated: number;
   title: string;
   contents: string;
   type_id: string;
   created_at: Date;
   updated_at: Date;
-  comments: any[];
-  likes: any[];
+  comments: Comments[];
+  likes: SimpleLikesReviews[];
   liked: boolean;
 }
 
@@ -62,8 +71,6 @@ export class ReviewsService {
     uid: string,
     typeId: string,
   ): Promise<CreateResponseReviewDTO[]> {
-    console.log("typeID", typeId); // "test123"
-
     const allReviews = await this.reviewRepository.find({
       where: { type_id: typeId },
     });
@@ -71,7 +78,6 @@ export class ReviewsService {
     if (!allReviews.length) {
       throw new HttpException("Review not found", HttpStatus.NOT_FOUND);
     }
-    console.log("allReviews", allReviews); // []
 
     const reviewsWithLikes = await Promise.all(
       allReviews.map(async review => {
@@ -80,12 +86,11 @@ export class ReviewsService {
               type_id: review.type_id,
             })
           : false;
-        review.liked = liked;
-        console.log(liked);
+        const nickname = await this.findNickname(uid);
 
         return {
           review_id: review.review_id,
-          user_uid: review.user_uid,
+          nickname: nickname,
           rated: review.rated,
           title: review.title,
           contents: review.contents,
@@ -93,7 +98,10 @@ export class ReviewsService {
           created_at: review.created_at,
           updated_at: review.updated_at,
           comments: review.comments,
-          likes: review.likes,
+          likes: review.likes.map(like => ({
+            id: like.id,
+            user_uid: like.user.uid,
+          })),
           liked,
         };
       }),
@@ -102,14 +110,80 @@ export class ReviewsService {
     return reviewsWithLikes;
   }
 
-  async getUserReviews(uid: string): Promise<Reviews[]> {
+  // 특정 리뷰조회
+  async getReviews(
+    uid: string,
+    reviewId: number,
+  ): Promise<CreateResponseReviewDTO> {
+    const review = await this.reviewRepository.findOne({
+      where: { review_id: reviewId },
+    });
+    console.log("특정리뷰 조회", uid, reviewId);
+
+    if (!review) {
+      throw new HttpException("Review not found", HttpStatus.NOT_FOUND);
+    }
+
+    const liked = uid
+      ? await this.likesService.checkLikeReviewId(uid, { review_id: reviewId })
+      : false;
+
+    const nickname = await this.findNickname(uid);
+
+    return {
+      review_id: review.review_id,
+      nickname: nickname,
+      rated: review.rated,
+      title: review.title,
+      contents: review.contents,
+      type_id: review.type_id,
+      created_at: review.created_at,
+      updated_at: review.updated_at,
+      comments: review.comments,
+      likes: review.likes.map(like => ({
+        id: like.id,
+        user_uid: like.user.uid,
+      })),
+      liked,
+    };
+  }
+
+  async getUserReviews(uid: string): Promise<CreateResponseReviewDTO[]> {
     const getUid = await this.reviewRepository.find({
       where: { user_uid: uid },
     });
     if (!getUid.length) {
       throw new HttpException("User review not found", HttpStatus.NOT_FOUND);
     }
-    return getUid;
+    const reviewsWithLikes = await Promise.all(
+      getUid.map(async review => {
+        const liked = uid
+          ? await this.likesService.checkLikeTypeid(uid, {
+              type_id: review.type_id,
+            })
+          : false;
+        const nickname = await this.findNickname(uid);
+
+        return {
+          review_id: review.review_id,
+          nickname,
+          rated: review.rated,
+          title: review.title,
+          contents: review.contents,
+          type_id: review.type_id,
+          created_at: review.created_at,
+          updated_at: review.updated_at,
+          comments: review.comments,
+          likes: review.likes.map(like => ({
+            id: like.id,
+            user_uid: like.user.uid,
+          })),
+          liked,
+        };
+      }),
+    );
+
+    return reviewsWithLikes;
   }
 
   // 리뷰 수정
@@ -174,6 +248,13 @@ export class ReviewsService {
     }
 
     return review;
+  }
+
+  //닉네임추출
+  public async findNickname(uid: string) {
+    const getNickname = await this.usersRepository.findOne({ where: { uid } });
+
+    return getNickname.nickname;
   }
 
   // type_id를 통한 별점 정보 추출
