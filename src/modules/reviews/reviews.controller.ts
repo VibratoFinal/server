@@ -39,6 +39,15 @@ export class ReviewsController {
     return this.reviewsService.addReview(uid, createReviewDTO);
   }
 
+  // 사이트 전체 리뷰 조회
+  @Get("/all")
+  @HttpCode(200)
+  @SkipAuthOptional()
+  async getAllReviewsinSite(@Request() req) {
+    const uid = req.user ? req.user.uid : null;
+    return await this.reviewsService.getAllReviewsinSite(uid);
+  }
+
   // 내가 쓴 리뷰 조회 -- user_uid
   @Get()
   @HttpCode(200)

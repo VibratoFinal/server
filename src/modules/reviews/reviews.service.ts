@@ -27,6 +27,7 @@ export class CreateResponseReviewDTO {
   updated_at: Date;
   comments: Comments[];
   likes: SimpleLikesReviews[];
+  numOfLikes?: number;
   liked: boolean;
 }
 
@@ -102,6 +103,46 @@ export class ReviewsService {
             id: like.id,
             user_uid: like.user.uid,
           })),
+          liked,
+        };
+      }),
+    );
+
+    return reviewsWithLikes;
+  }
+
+  // 사이트 모든 리뷰 전체 조회
+  async getAllReviewsinSite(uid: string): Promise<CreateResponseReviewDTO[]> {
+    const allReviews = await this.reviewRepository.find();
+
+    if (!allReviews.length) {
+      throw new HttpException("Review not found", HttpStatus.NOT_FOUND);
+    }
+
+    const reviewsWithLikes = await Promise.all(
+      allReviews.map(async review => {
+        const liked = uid
+          ? await this.likesService.checkLikeTypeid(uid, {
+              type_id: review.type_id,
+            })
+          : false;
+        const nickname = await this.findNickname(uid);
+
+        return {
+          review_id: review.review_id,
+          nickname: nickname,
+          rated: review.rated,
+          title: review.title,
+          contents: review.contents,
+          type_id: review.type_id,
+          created_at: review.created_at,
+          updated_at: review.updated_at,
+          comments: review.comments,
+          likes: review.likes.map(like => ({
+            id: like.id,
+            user_uid: like.user.uid,
+          })),
+          numOfLikes: review.likes.length,
           liked,
         };
       }),
