@@ -56,7 +56,6 @@ export class SpotifyService {
           limit: "20",
         },
       });
-
       return await this.musicsRepository.transformAll(uid, response.data);
     } catch (err) {
       console.error("Failed to Search Spotify All : ", err);
