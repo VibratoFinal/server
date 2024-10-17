@@ -1,6 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { ReviewsController } from "./reviews.controller";
-import { ReviewsService } from "./reviews.service";
+import { CreateResponseReviewDTO, ReviewsService } from "./reviews.service";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { Reviews } from "./entity/reviews.entity";
 import { Comments } from "../comments/entity/comments.entity";
@@ -8,6 +8,7 @@ import { FirebaseService } from "@/configs/firebase/firebase.service";
 import { Users } from "../auth/entity/auth.entity";
 import { DeleteResult, InsertResult, UpdateResult } from "typeorm";
 import { CreateReviewDTO } from "./dto/create-reviews.dto";
+import { LikesService } from "../likes/likes.service";
 
 describe("ReviewsController", () => {
   let controller: ReviewsController;
@@ -24,10 +25,11 @@ describe("ReviewsController", () => {
     type_id: "112cd",
   };
 
-  const mockAllReviews: Reviews[] = [
+  const mockAllReviews: CreateResponseReviewDTO[] = [
     {
       review_id: 1,
       user_uid: "mock-uid",
+      nickname: "test",
       rated: 5,
       title: "리뷰 테스트 제목",
       contents: "리뷰 테스트",
@@ -36,6 +38,7 @@ describe("ReviewsController", () => {
       updated_at: new Date(),
       comments: null,
       likes: [],
+      liked: false,
     },
   ];
   beforeEach(async () => {
@@ -44,6 +47,7 @@ describe("ReviewsController", () => {
       providers: [
         ReviewsService,
         { provide: FirebaseService, useValue: {} },
+        { provide: LikesService, useValue: {} },
         { provide: getRepositoryToken(Reviews), useValue: {} },
         { provide: getRepositoryToken(Comments), useValue: {} },
         { provide: getRepositoryToken(Users), useValue: {} },
@@ -84,9 +88,12 @@ describe("ReviewsController", () => {
       jest
         .spyOn(reviewsService, "getAllReviews")
         .mockResolvedValue(mockAllReviews);
-      const result = await controller.getAllReviews(typeId);
+      const result = await controller.getAllReviews(req, typeId);
 
-      expect(reviewsService.getAllReviews).toHaveBeenCalledWith(typeId);
+      expect(reviewsService.getAllReviews).toHaveBeenCalledWith(
+        req.user.uid,
+        typeId,
+      );
       expect(result).toEqual(mockAllReviews);
     });
   });

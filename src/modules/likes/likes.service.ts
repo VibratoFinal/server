@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { LikesReviews } from "./entity/likesReview.entity";
-import { Repository } from "typeorm";
+import { DeleteResult, InsertResult, Repository } from "typeorm";
 import { LikesComments } from "./entity/likesComment.entity";
 import { Users } from "@modules/auth/entity/auth.entity";
 import {
@@ -41,7 +41,10 @@ export class LikesService {
     return user;
   }
 
-  async addLikeReview(uid: string, createLikesReviewDTO: CreateLikesReviewDTO) {
+  async addLikeReview(
+    uid: string,
+    createLikesReviewDTO: CreateLikesReviewDTO,
+  ): Promise<InsertResult> {
     const { review_id } = createLikesReviewDTO;
 
     const findReview = await this.reviewRepository.findOne({
@@ -51,13 +54,19 @@ export class LikesService {
     if (!findReview) {
       throw new HttpException("review not found", HttpStatus.NOT_FOUND);
     }
+    console.log("findReview", findReview);
+
     const user = await this.findUserByUid(uid);
+    console.log("user", user.uid);
+
     try {
       return await this.likesReviewRepository.insert({
-        user_uid: user,
-        review_id: findReview,
+        user: user,
+        review: findReview,
       });
     } catch (error) {
+      console.error(error);
+
       if (error.code === "ER_DUP_ENTRY") {
         throw new HttpException("Already add LikeReview", HttpStatus.CONFLICT);
       }
@@ -67,7 +76,7 @@ export class LikesService {
   async addLikeComment(
     uid: string,
     createLikesCommentDTO: CreateLikesCommentDTO,
-  ) {
+  ): Promise<InsertResult> {
     const { review_id, comment_id } = createLikesCommentDTO;
     const findReview = await this.reviewRepository.findOne({
       where: { review_id },
@@ -82,8 +91,8 @@ export class LikesService {
     const user = await this.findUserByUid(uid);
     try {
       return await this.likesCommentRepository.insert({
-        user_uid: user,
-        review_id: findReview,
+        user: user,
+        review: findReview,
         comment: findComment,
       });
     } catch (error) {
@@ -93,10 +102,10 @@ export class LikesService {
     }
   }
 
-  async removeLikeReview(
+  async deleteLikeReview(
     uid: string,
     createLikesReviewDTO: CreateLikesReviewDTO,
-  ) {
+  ): Promise<DeleteResult> {
     const user = await this.findUserByUid(uid);
     const { review_id } = createLikesReviewDTO;
     const findReview = await this.reviewRepository.findOne({
@@ -104,8 +113,8 @@ export class LikesService {
     });
 
     const deleteLikeReview = await this.likesReviewRepository.delete({
-      user_uid: user,
-      review_id: findReview,
+      user: user,
+      review: findReview,
     });
 
     if (deleteLikeReview.affected === 0) {
@@ -114,12 +123,14 @@ export class LikesService {
         HttpStatus.NOT_FOUND,
       );
     }
+
+    return deleteLikeReview;
   }
 
-  async removeLikeComment(
+  async deleteLikeComment(
     uid: string,
     createLikesCommentDTO: CreateLikesCommentDTO,
-  ) {
+  ): Promise<DeleteResult> {
     const user = await this.findUserByUid(uid);
     const { review_id, comment_id } = createLikesCommentDTO;
     const findReview = await this.reviewRepository.findOne({
@@ -130,13 +141,68 @@ export class LikesService {
     });
 
     const deleteLikeComment = await this.likesCommentRepository.delete({
-      user_uid: user,
-      review_id: findReview,
+      user: user,
+      review: findReview,
       comment: findComment,
     });
 
     if (deleteLikeComment.affected === 0) {
       throw new HttpException("Like Comment Error", HttpStatus.NOT_FOUND);
+    }
+    return deleteLikeComment;
+  }
+
+  async checkLikeReviewId(
+    uid: string,
+    createReviewDTO: CreateLikesReviewDTO,
+  ): Promise<boolean> {
+    const user = await this.findUserByUid(uid);
+    const review_id = createReviewDTO.review_id;
+    console.log("리뷰좋아요 회원uid", user);
+    console.log("리뷰좋아요 리뷰id", review_id);
+
+    const results = await this.likesReviewRepository.findOne({
+      where: { review: { review_id } },
+    });
+    console.log("checkLikeReviewId", results);
+
+    if (!results) {
+      console.log(`해당 리뷰(${review_id})에 대한 좋아요 기록이 없습니다.`);
+      return false;
+    }
+    if (results.user.uid === user.uid) {
+      return true;
+    }
+
+    return false;
+  }
+
+  async checkLikeCommentId(
+    uid: string,
+    createLikesCommentDTO: CreateLikesCommentDTO,
+  ) {
+    const user = await this.findUserByUid(uid);
+    const review_id = createLikesCommentDTO.review_id;
+    const comment_id = createLikesCommentDTO.comment_id;
+    try {
+      const results = await this.likesCommentRepository.find({
+        where: {
+          review: { review_id },
+          comment: { comment_id },
+        },
+      });
+
+      const liked = results.some(result => result.user.uid === user.uid);
+      return liked;
+    } catch (error) {
+      console.error(
+        `Error happens while finding whether ${user.nickname} like ${review_id} :`,
+        error,
+      );
+      throw new HttpException(
+        `Error happens while finding whether ${user.nickname} like ${review_id}.`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -167,7 +233,7 @@ export class LikesService {
   }
 
   // type_id 좋아요 제거
-  async removeLikeType(uid: string, createLikesTypeDTO: CreateLikesTypeDTO) {
+  async deleteLikeType(uid: string, createLikesTypeDTO: CreateLikesTypeDTO) {
     const type_id = createLikesTypeDTO.type_id;
     const user = await this.findUserByUid(uid);
     try {
@@ -202,6 +268,8 @@ export class LikesService {
           type_id,
         },
       });
+      console.log(results);
+
       for (const result of results) {
         if (result.user_uid.uid === user.uid) {
           return true;

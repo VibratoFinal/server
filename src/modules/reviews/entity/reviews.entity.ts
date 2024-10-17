@@ -38,7 +38,7 @@ export class Reviews {
   @OneToMany(() => Comments, comment => comment.review, { eager: true })
   comments: Comments[];
 
-  @OneToMany(() => LikesReviews, likeReview => likeReview.review_id, {
+  @OneToMany(() => LikesReviews, likeReview => likeReview.review, {
     eager: true,
   })
   likes: LikesReviews[];

@@ -1,12 +1,14 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { CommentsController } from "@modules/comments/comments.controller";
-import { CommentsService } from "./comments.service";
+import { CommentsService, CreateResponseCommentDTO } from "./comments.service";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { Comments } from "./entity/comments.entity";
 import { Reviews } from "../reviews/entity/reviews.entity";
 import { FirebaseService } from "@/configs/firebase/firebase.service";
 import { Users } from "../auth/entity/auth.entity";
 import { DeleteResult, InsertResult, UpdateResult } from "typeorm";
+import { LikesService } from "../likes/likes.service";
+import { ReviewsService } from "../reviews/reviews.service";
 
 describe("CommentsController", () => {
   let controller: CommentsController;
@@ -17,15 +19,17 @@ describe("CommentsController", () => {
   const reviewId = 1;
   const commentId = 2;
   const createCommentDTO = { contents: "댓글작성 테스트" };
-  const mockComments: Comments[] = [
+
+  const mockComments: CreateResponseCommentDTO[] = [
     {
       comment_id: 1,
-      user_uid: req.user.uid,
       contents: "내가 쓴 댓글 조회 테스트",
+      nickname: "test",
+      user_uid: "mock-uid",
       created_at: new Date(),
       updated_at: new Date(),
       likes: [],
-      review: null,
+      liked: false,
     },
   ];
   beforeEach(async () => {
@@ -34,6 +38,8 @@ describe("CommentsController", () => {
       providers: [
         CommentsService,
         { provide: FirebaseService, useValue: {} },
+        { provide: LikesService, useValue: {} },
+        { provide: ReviewsService, useValue: {} },
         { provide: getRepositoryToken(Comments), useValue: {} },
         { provide: getRepositoryToken(Reviews), useValue: {} },
         { provide: getRepositoryToken(Users), useValue: {} },
@@ -67,7 +73,7 @@ describe("CommentsController", () => {
         createCommentDTO,
       );
       expect(commentsService.addComment).toHaveBeenCalledWith(
-        "mock-uid",
+        req.user.uid,
         reviewId,
         createCommentDTO,
       );
@@ -80,9 +86,12 @@ describe("CommentsController", () => {
       jest
         .spyOn(commentsService, "getAllComments")
         .mockResolvedValue(mockComments);
-      const result = await controller.getAllComments(reviewId);
+      const result = await controller.getAllComments(req, reviewId);
 
-      expect(commentsService.getAllComments).toHaveBeenCalledWith(reviewId);
+      expect(commentsService.getAllComments).toHaveBeenCalledWith(
+        req.user.uid,
+        reviewId,
+      );
       expect(result).toEqual(mockComments);
     });
   });
@@ -95,7 +104,9 @@ describe("CommentsController", () => {
 
       const result = await controller.getUserComments(req);
 
-      expect(commentsService.getUserComments).toHaveBeenCalledWith("mock-uid");
+      expect(commentsService.getUserComments).toHaveBeenCalledWith(
+        req.user.uid,
+      );
       expect(result).toBe(mockComments);
     });
   });
@@ -119,7 +130,7 @@ describe("CommentsController", () => {
       expect(commentsService.editComments).toHaveBeenCalledWith(
         reviewId,
         commentId,
-        "mock-uid",
+        req.user.uid,
         createCommentDTO,
       );
       expect(result).toBe(mockEditComment);
@@ -139,7 +150,7 @@ describe("CommentsController", () => {
       expect(commentsService.deleteComment).toHaveBeenCalledWith(
         reviewId,
         commentId,
-        "mock-uid",
+        req.user.uid,
       );
       expect(result).toBe(mockDeleteComment);
     });

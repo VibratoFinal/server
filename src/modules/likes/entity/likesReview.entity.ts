@@ -9,18 +9,18 @@ import {
 } from "typeorm";
 
 @Entity()
-@Unique(["user_uid", "review_id"])
+@Unique(["review"])
 export class LikesReviews {
   @PrimaryGeneratedColumn()
   id: number;
 
   @ManyToOne(() => Users, user => user.uid, { eager: true })
   @JoinColumn({ name: "user_uid" })
-  user_uid: Users;
+  user: Users;
 
   @ManyToOne(() => Reviews, review => review.review_id, {
     onDelete: "CASCADE",
   })
   @JoinColumn({ name: "review_id" })
-  review_id: Reviews;
+  review: Reviews;
 }

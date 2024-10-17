@@ -20,6 +20,9 @@ export class Comments {
   user_uid: string;
 
   @Column()
+  nickname: string;
+
+  @Column()
   contents: string;
 
   @ManyToOne(() => Reviews, review => review.comments)

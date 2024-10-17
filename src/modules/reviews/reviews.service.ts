@@ -5,6 +5,27 @@ import { DeleteResult, InsertResult, Repository, UpdateResult } from "typeorm";
 import { CreateReviewDTO } from "./dto/create-reviews.dto";
 import { Comments } from "../comments/entity/comments.entity";
 import { Users } from "../auth/entity/auth.entity";
+import { LikesService } from "../likes/likes.service";
+
+export class SimpleLikesReviews {
+  id: number;
+  user_uid: string;
+}
+
+export class CreateResponseReviewDTO {
+  review_id: number;
+  user_uid: string;
+  nickname: string;
+  rated: number;
+  title: string;
+  contents: string;
+  type_id: string;
+  created_at: Date;
+  updated_at: Date;
+  comments: Comments[];
+  likes: SimpleLikesReviews[];
+  liked: boolean;
+}
 
 @Injectable()
 export class ReviewsService {
@@ -17,6 +38,8 @@ export class ReviewsService {
 
     @InjectRepository(Users)
     private usersRepository: Repository<Users>,
+
+    private readonly likesService: LikesService,
   ) {}
 
   private async findUserByUid(uid: string): Promise<Users> {
@@ -41,24 +64,126 @@ export class ReviewsService {
   }
 
   // type_id (트랙,앨범,아티스트) 리뷰 전체 조회
-  async getAllReviews(typeId: string): Promise<Reviews[]> {
+  async getAllReviews(
+    uid: string,
+    typeId: string,
+  ): Promise<CreateResponseReviewDTO[]> {
     const allReviews = await this.reviewRepository.find({
       where: { type_id: typeId },
     });
+
     if (!allReviews.length) {
       throw new HttpException("Review not found", HttpStatus.NOT_FOUND);
     }
-    return allReviews;
+
+    const reviewsWithLikes = await Promise.all(
+      allReviews.map(async review => {
+        const liked = uid
+          ? await this.likesService.checkLikeTypeid(uid, {
+              type_id: review.type_id,
+            })
+          : false;
+        const nickname = await this.findNickname(uid);
+
+        return {
+          review_id: review.review_id,
+          nickname: nickname,
+          user_uid: review.user_uid,
+          rated: review.rated,
+          title: review.title,
+          contents: review.contents,
+          type_id: review.type_id,
+          created_at: review.created_at,
+          updated_at: review.updated_at,
+          comments: review.comments,
+          likes: review.likes.map(like => ({
+            id: like.id,
+            user_uid: like.user.uid,
+          })),
+          liked,
+        };
+      }),
+    );
+
+    return reviewsWithLikes;
   }
 
-  async getUserReviews(uid: string): Promise<Reviews[]> {
+  // 특정 리뷰조회
+  async getReviews(
+    uid: string,
+    reviewId: number,
+  ): Promise<CreateResponseReviewDTO> {
+    const review = await this.reviewRepository.findOne({
+      where: { review_id: reviewId },
+    });
+    console.log("특정리뷰 조회", uid, reviewId);
+
+    if (!review) {
+      throw new HttpException("Review not found", HttpStatus.NOT_FOUND);
+    }
+
+    const liked = uid
+      ? await this.likesService.checkLikeReviewId(uid, { review_id: reviewId })
+      : false;
+
+    const nickname = await this.findNickname(uid);
+
+    return {
+      review_id: review.review_id,
+      nickname: nickname,
+      user_uid: review.user_uid,
+      rated: review.rated,
+      title: review.title,
+      contents: review.contents,
+      type_id: review.type_id,
+      created_at: review.created_at,
+      updated_at: review.updated_at,
+      comments: review.comments,
+      likes: review.likes.map(like => ({
+        id: like.id,
+        user_uid: like.user.uid,
+      })),
+      liked,
+    };
+  }
+
+  async getUserReviews(uid: string): Promise<CreateResponseReviewDTO[]> {
     const getUid = await this.reviewRepository.find({
       where: { user_uid: uid },
     });
     if (!getUid.length) {
       throw new HttpException("User review not found", HttpStatus.NOT_FOUND);
     }
-    return getUid;
+    const reviewsWithLikes = await Promise.all(
+      getUid.map(async review => {
+        const liked = uid
+          ? await this.likesService.checkLikeTypeid(uid, {
+              type_id: review.type_id,
+            })
+          : false;
+        const nickname = await this.findNickname(uid);
+
+        return {
+          review_id: review.review_id,
+          nickname,
+          user_uid: review.user_uid,
+          rated: review.rated,
+          title: review.title,
+          contents: review.contents,
+          type_id: review.type_id,
+          created_at: review.created_at,
+          updated_at: review.updated_at,
+          comments: review.comments,
+          likes: review.likes.map(like => ({
+            id: like.id,
+            user_uid: like.user.uid,
+          })),
+          liked,
+        };
+      }),
+    );
+
+    return reviewsWithLikes;
   }
 
   // 리뷰 수정
@@ -123,6 +248,13 @@ export class ReviewsService {
     }
 
     return review;
+  }
+
+  //닉네임추출
+  public async findNickname(uid: string) {
+    const getNickname = await this.usersRepository.findOne({ where: { uid } });
+
+    return getNickname.nickname;
   }
 
   // type_id를 통한 별점 정보 추출
