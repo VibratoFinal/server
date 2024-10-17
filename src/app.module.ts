@@ -23,6 +23,7 @@ import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { SearchsModule } from "./modules/searchs/searchs.module";
 import { FirebaseAuthGuard } from "./common/guards/firebase-auth.guard";
 import { LikesType } from "./modules/likes/entity/likesType.entity";
+import { SelectedModule } from "./modules/selected/selected.module";
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { LikesType } from "./modules/likes/entity/likesType.entity";
     CommentsModule,
     LikesModule,
     SearchsModule,
+    SelectedModule,
   ],
   controllers: [AppController],
   providers: [
