@@ -14,6 +14,7 @@ import { CreateResponseReviewDTO, ReviewsService } from "./reviews.service";
 import { CreateReviewDTO } from "./dto/create-reviews.dto";
 import { FirebaseAuthGuard } from "@/common/guards/firebase-auth.guard";
 import { SkipAuthOptional } from "@/common/decorators/skip-auth-optional.decorator";
+import { getUid } from "@/common/utils/helpers";
 
 // 리뷰 작성 add
 // 리뷰 전체 조회 getAll
@@ -37,6 +38,15 @@ export class ReviewsController {
     const { uid } = req.user;
 
     return this.reviewsService.addReview(uid, createReviewDTO);
+  }
+
+  // 사이트 전체 리뷰 조회
+  @Get("/all")
+  @HttpCode(200)
+  @SkipAuthOptional()
+  async getAllReviewsinSite(@Request() req) {
+    const uid = getUid(req);
+    return await this.reviewsService.getAllReviewsinSite(uid);
   }
 
   // 내가 쓴 리뷰 조회 -- user_uid
