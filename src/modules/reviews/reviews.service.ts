@@ -25,6 +25,7 @@ export class CreateResponseReviewDTO {
   comments: Comments[];
   likes: SimpleLikesReviews[];
   liked: boolean;
+  numOfLikes?: number;
 }
 
 @Injectable()
@@ -48,6 +49,47 @@ export class ReviewsService {
       throw new HttpException("User not found", HttpStatus.NOT_FOUND);
     }
     return user;
+  }
+
+  // 사이트 모든 리뷰 전체 조회
+  async getAllReviewsinSite(uid: string): Promise<CreateResponseReviewDTO[]> {
+    const allReviews = await this.reviewRepository.find();
+
+    if (!allReviews.length) {
+      throw new HttpException("Review not found", HttpStatus.NOT_FOUND);
+    }
+
+    const reviews = await Promise.all(
+      allReviews.map(async review => {
+        const liked = uid
+          ? await this.likesService.checkLikeTypeid(uid, {
+              type_id: review.type_id,
+            })
+          : false;
+        const nickname = await this.findNickname(uid);
+
+        return {
+          review_id: review.review_id,
+          user_uid: review.user_uid,
+          nickname: nickname,
+          rated: review.rated,
+          title: review.title,
+          contents: review.contents,
+          type_id: review.type_id,
+          created_at: review.created_at,
+          updated_at: review.updated_at,
+          comments: review.comments,
+          likes: review.likes.map(like => ({
+            id: like.id,
+            user_uid: like.user.uid,
+          })),
+          numOfLikes: review.likes.length,
+          liked,
+        };
+      }),
+    );
+
+    return reviews;
   }
 
   // 리뷰 작성
