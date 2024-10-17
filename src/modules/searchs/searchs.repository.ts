@@ -29,9 +29,9 @@ export class SearchsRepository {
       : false;
     return {
       name: res.name,
-      image_url: res.images[0].url,
+      image_url: res.images[0]?.url || "",
       genres: res.genres,
-      spotify_url: res.external_urls.spotify,
+      spotify_url: res.external_urls.spotify || "",
       avg_rated: avg,
       count_rated: count,
       liked,
@@ -51,12 +51,12 @@ export class SearchsRepository {
       : false;
     return {
       name: res.name,
-      image_url: res.images[0].url,
+      image_url: res.images[0]?.url || "",
       artist_names: res.artists.map(artist => artist.name),
       genres: res.genres,
       release_date: res.release_date,
       total_tracks: res.total_tracks,
-      spotify_url: res.external_urls.spotify,
+      spotify_url: res.external_urls.spotify || "",
       avg_rated: avg,
       count_rated: count,
       liked,
@@ -81,11 +81,11 @@ export class SearchsRepository {
 
     return {
       name: res.name,
-      image_url: res.album.images[0].url,
+      image_url: res.album.images[0]?.url || "",
       artist_names: res.artists.map(artist => artist.name),
       release_date: res.album.release_date,
-      preview_url: res.preview_url,
-      spotify_url: res.external_urls.spotify,
+      preview_url: res.preview_url || "",
+      spotify_url: res.external_urls.spotify || "",
       track_number: res.track_number,
       duration,
       avg_rated,
@@ -115,7 +115,7 @@ export class SearchsRepository {
           id: res.id,
           name: res.name,
           artist_names: res.artists.map(artist => artist.name),
-          preview_url: res.preview_url,
+          preview_url: res.preview_url || "",
           track_number: res.track_number,
           duration,
           avg_rated,
@@ -143,7 +143,7 @@ export class SearchsRepository {
         return {
           id: item.id,
           name: item.name,
-          spotify_url: item.external_urls.spotify,
+          spotify_url: item.external_urls.spotify || "",
           avg_rated,
           count_rated,
           liked,
@@ -170,7 +170,7 @@ export class SearchsRepository {
         return {
           id: item.id,
           name: item.name,
-          preview_url: item.preview_url,
+          preview_url: item.preview_url || "",
           duration,
           track_number: item.track_number,
           avg_rated,
@@ -196,7 +196,7 @@ export class SearchsRepository {
     return {
       id: res.id,
       name: res.name,
-      spotify_url: res.external_urls.spotify,
+      spotify_url: res.external_urls.spotify || "",
       avg_rated,
       count_rated,
       liked,
