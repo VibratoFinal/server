@@ -9,6 +9,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   const configService = app.get<ConfigService>(ConfigService);
   const frontendUrl = configService.get<string>("FRONTEND_URL");
+  console.log(frontendUrl);
 
   app.enableCors({
     origin: frontendUrl, // 프론트엔드 서버의 주소

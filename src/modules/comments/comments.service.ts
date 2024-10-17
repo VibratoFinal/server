@@ -80,7 +80,6 @@ export class CommentsService {
       where: { review: { review_id: reviewId } },
       relations: ["review"],
     });
-    console.log("해당 리뷰 댓글 전체 조회 Service", allComments);
 
     if (!allComments.length) {
       throw new HttpException("Comment not found", HttpStatus.NOT_FOUND);
