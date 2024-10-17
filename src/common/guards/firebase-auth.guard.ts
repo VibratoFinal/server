@@ -26,7 +26,6 @@ export class FirebaseAuthGuard implements CanActivate {
     const request: CustomRequest = context.switchToHttp().getRequest();
     const authHeader = request.headers["authorization"];
 
-    // Firebase 인증 생략
     const skipAuth = this.reflector.get<boolean>(
       SKIP_AUTH_KEY,
       context.getHandler(),
@@ -47,12 +46,10 @@ export class FirebaseAuthGuard implements CanActivate {
 
     const idToken = this.extractToken(authHeader);
 
-    // Firebase 토큰 검증
     const decodedToken = await this.verifyToken(idToken);
     request.user = decodedToken;
-    console.log("인증 성공");
 
-    return true; // 인증 성공
+    return true;
   }
 
   private extractToken(authHeader: string): string {
@@ -69,9 +66,6 @@ export class FirebaseAuthGuard implements CanActivate {
     try {
       const decodedToken =
         await this.firebaseService.admin.verifyIdToken(idToken);
-      console.log(decodedToken);
-
-      console.log("디코딩 성공");
 
       return decodedToken;
     } catch (error) {

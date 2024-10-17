@@ -42,8 +42,6 @@ export class CommentsController {
     @Param("review_id") review_id: number,
   ): Promise<CreateResponseCommentDTO[]> {
     const uid = req.user ? req.user.uid : null;
-    console.log("해당 리뷰 전체 댓글 조회", uid);
-    console.log("해당 리뷰 전체 댓글 조회", review_id);
 
     return await this.commentsService.getAllComments(uid, review_id);
   }
@@ -58,9 +56,7 @@ export class CommentsController {
     @Param("comment_id") comment_id: number,
   ): Promise<CreateResponseCommentDTO> {
     const uid = req.user ? req.user.uid : null;
-    console.log("특정 댓글 조회", uid);
-    console.log("특정 댓글 조회", review_id);
-    console.log("특정 댓글 조회", comment_id);
+
     return await this.commentsService.getComments(uid, review_id, comment_id);
   }
 

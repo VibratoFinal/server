@@ -125,7 +125,7 @@ export class ReviewsService {
               type_id: review.type_id,
             })
           : false;
-        const nickname = await this.findNickname(uid);
+        const nickname = await this.findNickname(review.user_uid);
 
         return {
           review_id: review.review_id,
@@ -168,7 +168,7 @@ export class ReviewsService {
       ? await this.likesService.checkLikeReviewId(uid, { review_id: reviewId })
       : false;
 
-    const nickname = await this.findNickname(uid);
+    const nickname = await this.findNickname(review.user_uid);
 
     return {
       review_id: review.review_id,
@@ -295,6 +295,7 @@ export class ReviewsService {
   //닉네임추출
   public async findNickname(uid: string) {
     const getNickname = await this.usersRepository.findOne({ where: { uid } });
+    console.log("getNickname", getNickname);
 
     return getNickname.nickname;
   }
