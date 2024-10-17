@@ -16,6 +16,7 @@ import { ReviewsService, SimpleLikesReviews } from "../reviews/reviews.service";
 
 export class CreateResponseCommentDTO {
   comment_id: number;
+  user_uid: string;
   nickname: string;
   contents: string;
   created_at: Date;
@@ -87,19 +88,21 @@ export class CommentsService {
 
     const commentsWithLikes = await Promise.all(
       allComments.map(async comment => {
-        const liked = uid
-          ? await this.likesService.checkLikeReviewId(uid, {
-              review_id: comment.review.review_id,
-            })
-          : false;
+        const liked =
+          uid && comment.review
+            ? await this.likesService.checkLikeReviewId(uid, {
+                review_id: comment.review.review_id,
+              })
+            : false;
         const nickname = await this.reviewsService.findNickname(uid);
         console.log("Check Like Inputs: ", {
-          review_id: comment.review.review_id,
+          review_id: comment.review?.review_id || "No review available",
         });
 
         return {
           comment_id: comment.comment_id,
           nickname,
+          user_uid: comment.user_uid,
           contents: comment.contents,
           created_at: comment.created_at,
           updated_at: comment.updated_at,
@@ -137,6 +140,7 @@ export class CommentsService {
     return {
       comment_id: comment.comment_id,
       nickname: comment.nickname,
+      user_uid: comment.user_uid,
       contents: comment.contents,
       created_at: comment.created_at,
       updated_at: comment.updated_at,
@@ -171,6 +175,7 @@ export class CommentsService {
         return {
           comment_id: comment.comment_id,
           nickname,
+          user_uid: comment.user_uid,
           contents: comment.contents,
           created_at: comment.created_at,
           updated_at: comment.updated_at,

@@ -10,14 +10,11 @@ import { LikesService } from "../likes/likes.service";
 export class SimpleLikesReviews {
   id: number;
   user_uid: string;
-
-  constructor(user_uid: string) {
-    this.user_uid = user_uid;
-  }
 }
 
 export class CreateResponseReviewDTO {
   review_id: number;
+  user_uid: string;
   nickname: string;
   rated: number;
   title: string;
@@ -91,6 +88,7 @@ export class ReviewsService {
         return {
           review_id: review.review_id,
           nickname: nickname,
+          user_uid: review.user_uid,
           rated: review.rated,
           title: review.title,
           contents: review.contents,
@@ -133,6 +131,7 @@ export class ReviewsService {
     return {
       review_id: review.review_id,
       nickname: nickname,
+      user_uid: review.user_uid,
       rated: review.rated,
       title: review.title,
       contents: review.contents,
@@ -167,6 +166,7 @@ export class ReviewsService {
         return {
           review_id: review.review_id,
           nickname,
+          user_uid: review.user_uid,
           rated: review.rated,
           title: review.title,
           contents: review.contents,

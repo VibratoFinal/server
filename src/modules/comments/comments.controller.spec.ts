@@ -7,7 +7,8 @@ import { Reviews } from "../reviews/entity/reviews.entity";
 import { FirebaseService } from "@/configs/firebase/firebase.service";
 import { Users } from "../auth/entity/auth.entity";
 import { DeleteResult, InsertResult, UpdateResult } from "typeorm";
-import { SimpleLikesReviews } from "../reviews/reviews.service";
+import { LikesService } from "../likes/likes.service";
+import { ReviewsService } from "../reviews/reviews.service";
 
 describe("CommentsController", () => {
   let controller: CommentsController;
@@ -24,9 +25,10 @@ describe("CommentsController", () => {
       comment_id: 1,
       contents: "내가 쓴 댓글 조회 테스트",
       nickname: "test",
+      user_uid: "mock-uid",
       created_at: new Date(),
       updated_at: new Date(),
-      likes: [new SimpleLikesReviews("mock-uid")],
+      likes: [],
       liked: false,
     },
   ];
@@ -36,6 +38,8 @@ describe("CommentsController", () => {
       providers: [
         CommentsService,
         { provide: FirebaseService, useValue: {} },
+        { provide: LikesService, useValue: {} },
+        { provide: ReviewsService, useValue: {} },
         { provide: getRepositoryToken(Comments), useValue: {} },
         { provide: getRepositoryToken(Reviews), useValue: {} },
         { provide: getRepositoryToken(Users), useValue: {} },
@@ -82,9 +86,12 @@ describe("CommentsController", () => {
       jest
         .spyOn(commentsService, "getAllComments")
         .mockResolvedValue(mockComments);
-      const result = await controller.getAllComments(req.user, reviewId);
+      const result = await controller.getAllComments(req, reviewId);
 
-      expect(commentsService.getAllComments).toHaveBeenCalledWith(reviewId);
+      expect(commentsService.getAllComments).toHaveBeenCalledWith(
+        req.user.uid,
+        reviewId,
+      );
       expect(result).toEqual(mockComments);
     });
   });

@@ -28,6 +28,7 @@ describe("ReviewsController", () => {
   const mockAllReviews: CreateResponseReviewDTO[] = [
     {
       review_id: 1,
+      user_uid: "mock-uid",
       nickname: "test",
       rated: 5,
       title: "리뷰 테스트 제목",
@@ -45,8 +46,8 @@ describe("ReviewsController", () => {
       controllers: [ReviewsController],
       providers: [
         ReviewsService,
-        LikesService,
         { provide: FirebaseService, useValue: {} },
+        { provide: LikesService, useValue: {} },
         { provide: getRepositoryToken(Reviews), useValue: {} },
         { provide: getRepositoryToken(Comments), useValue: {} },
         { provide: getRepositoryToken(Users), useValue: {} },
@@ -87,9 +88,12 @@ describe("ReviewsController", () => {
       jest
         .spyOn(reviewsService, "getAllReviews")
         .mockResolvedValue(mockAllReviews);
-      const result = await controller.getAllReviews(req.user, typeId);
+      const result = await controller.getAllReviews(req, typeId);
 
-      expect(reviewsService.getAllReviews).toHaveBeenCalledWith(typeId);
+      expect(reviewsService.getAllReviews).toHaveBeenCalledWith(
+        req.user.uid,
+        typeId,
+      );
       expect(result).toEqual(mockAllReviews);
     });
   });
